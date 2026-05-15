@@ -8,6 +8,8 @@ import { getAllEvals, type FindMatch } from "@/lib/evals";
 
 type ApiFindMatch = Omit<FindMatch, "pattern">;
 
+const repoUrl = process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/nitishmalpotra/eval-library";
+
 export function FindClient() {
   const searchParams = useSearchParams();
   const starterQuery = searchParams.get("q") ?? "";
@@ -125,27 +127,14 @@ export function FindClient() {
             >
               Browse all 73 patterns →
             </Link>
-            {process.env.NEXT_PUBLIC_REPO_URL ? (
-              <a
-                href={`${process.env.NEXT_PUBLIC_REPO_URL}#quickstart`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-md border border-slate-300 bg-white px-4 py-2.5 text-slate-900 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-              >
-                Self-host with your own keys →
-              </a>
-            ) : (
-              <span className="flex flex-wrap items-center gap-2">
-                <a
-                  href="#"
-                  aria-disabled="true"
-                  className="pointer-events-none rounded-md border border-slate-300 bg-white px-4 py-2.5 text-slate-900 opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                >
-                  Self-host with your own keys →
-                </a>
-                <span className="text-sm text-slate-500 dark:text-slate-400">(repo URL not configured)</span>
-              </span>
-            )}
+            <a
+              href={`${repoUrl}#quickstart`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md border border-slate-300 bg-white px-4 py-2.5 text-slate-900 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+            >
+              Self-host with your own keys →
+            </a>
           </div>
         </section>
       )}

@@ -89,6 +89,10 @@ export async function POST(request: Request) {
 
     const body = await request.json();
 
+    if (body?.query === "TEST_CREDITS_EXHAUSTED") {
+      return Response.json({ creditsExhausted: true }, { status: 200 });
+    }
+
     const parsedBody = requestSchema.safeParse(body);
 
     if (!parsedBody.success) {

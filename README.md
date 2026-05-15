@@ -2,7 +2,7 @@
 
 > Every AI eval pattern from Lenny's operators, made buildable.
 
-[Live demo](https://[fill-in-after-deploy].vercel.app)
+[Live demo](https://eval-library.vercel.app)
 
 A curated, opinionated library of AI evaluation patterns extracted from Lenny Rachitsky's newsletter and podcast corpus. Browse 73 patterns, find evals matched to your AI feature via semantic search, and paste pre-engineered Codex prompts straight into your workflow.
 

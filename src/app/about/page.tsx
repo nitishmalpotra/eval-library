@@ -31,7 +31,7 @@ export default function AboutPage() {
 
         <Section title="Schema">
           <p className="text-slate-700 dark:text-slate-300">
-            Every pattern has name, one-liner, definition, explanation, when/when-not-to-use, metric, pitfalls, source citation with link, and a Codex prompt template you can paste into your dev workflow.
+            Every pattern has name, one-liner, definition, explanation, when/when-not-to-use, metric, pitfalls, source citation with link, and a prompt template you can paste into any AI tool.
           </p>
         </Section>
 

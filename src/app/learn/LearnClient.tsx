@@ -165,11 +165,11 @@ function StepThree({ pattern }: { pattern: EvalPattern }) {
           <Annotation>the source of truth — every claim above must be traceable here</Annotation>
         </section>
         <section>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Codex prompt</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Prompt template</h3>
           <pre className="mt-3 overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm leading-6 text-slate-100">
             <code>{pattern.codex_prompt_template}</code>
           </pre>
-          <Annotation>this is what makes the pattern actionable — paste it into Codex/Cursor and substitute the placeholders</Annotation>
+          <Annotation>this is what makes the pattern actionable — paste it into any AI tool (Claude, ChatGPT, Cursor, Codex, etc.) and substitute the placeholders</Annotation>
         </section>
       </div>
     </>
@@ -213,7 +213,7 @@ function StepFour({ pattern }: { pattern: EvalPattern }) {
         <p>3. One-liner</p>
         <p>4. Source citation</p>
         <p>5. Body sections</p>
-        <p>6. Codex prompt</p>
+        <p>6. Prompt template</p>
       </div>
     </>
   );

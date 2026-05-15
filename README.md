@@ -4,7 +4,7 @@
 
 [Live demo](https://eval-library.vercel.app)
 
-A curated, opinionated library of AI evaluation patterns extracted from Lenny Rachitsky's newsletter and podcast corpus. Browse 73 patterns, find evals matched to your AI feature via semantic search, and paste pre-engineered Codex prompts straight into your workflow.
+A curated, opinionated library of AI evaluation patterns extracted from Lenny Rachitsky's newsletter and podcast corpus. Browse 73 patterns, find evals matched to your AI feature via semantic search, and paste pre-engineered prompt templates straight into your workflow. Compatible with Codex, Cursor, Claude Code, ChatGPT, and similar AI tools.
 
 ## Stack
 - Next.js 15 (App Router) + React 19 + TypeScript

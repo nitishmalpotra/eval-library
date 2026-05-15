@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CategoryBadge } from "@/components/CategoryBadge";
-import { CodexPromptCopier } from "@/components/CodexPromptCopier";
+import { PromptTemplateCopier } from "@/components/PromptTemplateCopier";
 import { DifficultyBadge } from "@/components/DifficultyBadge";
 import { SourceCitation } from "@/components/SourceCitation";
 import { getAllEvals, getEvalById } from "@/lib/evals";
@@ -114,9 +114,9 @@ export default async function EvalDetailPage({ params }: EvalDetailPageProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Drop into Codex</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Drop into your AI tool</h2>
           <div className="mt-4">
-            <CodexPromptCopier prompt={pattern.codex_prompt_template} />
+            <PromptTemplateCopier prompt={pattern.codex_prompt_template} />
           </div>
         </section>
 

@@ -46,7 +46,7 @@ export default function Home() {
             Every AI eval pattern from Lenny&apos;s operators, made buildable.
           </p>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">
-            Browse practical eval patterns, understand when to use them, and copy a ready-to-adapt Codex prompt into your workflow.
+            Browse practical eval patterns, understand when to use them, and copy a ready-to-adapt prompt into your workflow.
           </p>
           <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
             Built from Lenny Rachitsky&apos;s public newsletter and podcast corpus.

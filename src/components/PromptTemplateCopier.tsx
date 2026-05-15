@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function CodexPromptCopier({ prompt }: { prompt: string }) {
+export function PromptTemplateCopier({ prompt }: { prompt: string }) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -26,7 +26,7 @@ export function CodexPromptCopier({ prompt }: { prompt: string }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 text-slate-100">
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-        <span className="font-mono text-xs uppercase tracking-[0.16em] text-slate-400">Codex prompt</span>
+        <span className="font-mono text-xs uppercase tracking-[0.16em] text-slate-400">Prompt template</span>
         <button
           type="button"
           onClick={handleCopy}

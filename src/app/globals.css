@@ -16,9 +16,16 @@
   --font-mono: var(--font-jetbrains-mono);
 }
 
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: white;
+  color: rgb(15 23 42);
+}
+
+.dark,
+.dark body {
+  background-color: rgb(2 6 23);
+  color: rgb(241 245 249);
 }
 
 @keyframes fadeIn {

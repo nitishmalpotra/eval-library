@@ -115,7 +115,7 @@ export function FindClient() {
         )}
 
         {!isLoading && !error && results === null && (
-          <p className="text-sm leading-6 text-slate-500">
+          <p className="text-sm leading-6 text-slate-500 dark:text-slate-400">
             Try: &apos;I&apos;m building an agent that books meetings on my calendar&apos; or &apos;I need evals for a
             RAG-based search over our docs.&apos;
           </p>

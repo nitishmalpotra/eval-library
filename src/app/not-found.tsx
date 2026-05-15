@@ -4,7 +4,9 @@ export default function NotFound() {
   return (
     <main className="mx-auto flex max-w-3xl flex-col items-start px-6 py-20">
       <p className="font-mono text-xs uppercase tracking-[0.18em] text-slate-500">404</p>
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight">That page is not in the library.</h1>
+      <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+        That page is not in the library.
+      </h1>
       <Link href="/" className="mt-6 text-sm text-blue-600 dark:text-blue-400">
         Back to home →
       </Link>

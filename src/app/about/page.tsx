@@ -12,11 +12,13 @@ export default function AboutPage() {
     <main className="mx-auto max-w-3xl px-6 py-12 text-slate-950 dark:text-slate-100">
       <div className="space-y-10">
         <Section title="What this is">
-          <p>A curated, opinionated library of AI evaluation patterns extracted from Lenny Rachitsky&apos;s newsletter and podcast corpus. Built as a free, open-source reference for AI PMs.</p>
+          <p className="text-slate-700 dark:text-slate-300">
+            A curated, opinionated library of AI evaluation patterns extracted from Lenny Rachitsky&apos;s newsletter and podcast corpus. Built as a free, open-source reference for AI PMs.
+          </p>
         </Section>
 
         <Section title="How patterns are extracted">
-          <ol className="list-decimal space-y-2 pl-5">
+          <ol className="list-decimal space-y-2 pl-5 text-slate-700 dark:text-slate-300">
             <li>Filter Lenny&apos;s 354 newsletters and 298 podcasts to a tier-1 set explicitly about evals plus a tier-2 sweep of AI-tagged files mentioning “eval”.</li>
             <li>DeepSeek extracts structured patterns per the schema.</li>
             <li>Semantic clustering merges duplicates across operators.</li>
@@ -28,20 +30,28 @@ export default function AboutPage() {
         </Section>
 
         <Section title="Schema">
-          <p>Every pattern has name, one-liner, definition, explanation, when/when-not-to-use, metric, pitfalls, source citation with link, and a Codex prompt template you can paste into your dev workflow.</p>
+          <p className="text-slate-700 dark:text-slate-300">
+            Every pattern has name, one-liner, definition, explanation, when/when-not-to-use, metric, pitfalls, source citation with link, and a Codex prompt template you can paste into your dev workflow.
+          </p>
         </Section>
 
         <Section title="Attribution">
-          <p>All source content belongs to Lenny Rachitsky. This site presents extracted summaries with attribution and links back to the originals.</p>
-          <p className="mt-4">If you are Lenny: thank you for the corpus. If anything here is off or you&apos;d like it taken down, please file an issue on GitHub or email [the user can fill this in later].</p>
+          <p className="text-slate-700 dark:text-slate-300">
+            All source content belongs to Lenny Rachitsky. This site presents extracted summaries with attribution and links back to the originals.
+          </p>
+          <p className="mt-4 text-slate-700 dark:text-slate-300">
+            If you are Lenny: thank you for the corpus. If anything here is off or you&apos;d like it taken down, please file an issue on GitHub or email [the user can fill this in later].
+          </p>
         </Section>
 
         <Section title="Stack">
-          <p>Next.js 15, TypeScript, Tailwind v4, DeepSeek for extraction + rationale generation, OpenAI text-embedding-3-small for semantic search. Hosted on Vercel.</p>
+          <p className="text-slate-700 dark:text-slate-300">
+            Next.js 15, TypeScript, Tailwind v4, DeepSeek for extraction + rationale generation, OpenAI text-embedding-3-small for semantic search. Hosted on Vercel.
+          </p>
         </Section>
 
         <Section title="Contribute">
-          <p>
+          <p className="text-slate-700 dark:text-slate-300">
             Open a GitHub issue with the “missing pattern” or “extraction error” template.{" "}
             <a href={process.env.NEXT_PUBLIC_REPO_URL ?? "#"} className="text-blue-600 dark:text-blue-400">
               Go to GitHub
@@ -51,7 +61,7 @@ export default function AboutPage() {
         </Section>
 
         <Section title="Acknowledgments">
-          <p>Lenny Rachitsky and every operator quoted in the library.</p>
+          <p className="text-slate-700 dark:text-slate-300">Lenny Rachitsky and every operator quoted in the library.</p>
         </Section>
       </div>
     </main>
@@ -61,8 +71,8 @@ export default function AboutPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-      <div className="mt-4 leading-7 text-slate-700 dark:text-slate-300">{children}</div>
+      <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">{title}</h1>
+      <div className="mt-4 leading-7">{children}</div>
     </section>
   );
 }

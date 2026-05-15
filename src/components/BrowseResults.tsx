@@ -34,13 +34,13 @@ export function BrowseResults({ patterns }: { patterns: EvalPattern[] }) {
   return (
     <section>
       <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
-        <p className="text-sm text-slate-500">{filteredPatterns.length} patterns</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{filteredPatterns.length} patterns</p>
         <Link href="/find" className="text-sm text-blue-600 dark:text-blue-400">
           Don&apos;t know where to start? Try Find →
         </Link>
       </div>
       {filteredPatterns.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 px-6 py-16 text-center text-slate-500 dark:border-slate-700">
+        <div className="rounded-2xl border border-dashed border-slate-300 px-6 py-16 text-center text-slate-500 dark:border-slate-700 dark:text-slate-400">
           No patterns match. Try clearing some filters.
         </div>
       ) : (

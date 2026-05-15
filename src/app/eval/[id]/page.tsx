@@ -55,7 +55,7 @@ export default async function EvalDetailPage({ params }: EvalDetailPageProps) {
             </span>
           ))}
         </div>
-        <h1 className="mt-5 text-4xl font-semibold tracking-tight">{pattern.name}</h1>
+        <h1 className="mt-5 text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">{pattern.name}</h1>
         <p className="mt-4 text-lg leading-8 text-slate-700 dark:text-slate-300">{pattern.one_liner}</p>
         <div className="mt-5">
           <SourceCitation
@@ -69,13 +69,13 @@ export default async function EvalDetailPage({ params }: EvalDetailPageProps) {
 
       <article className="space-y-10 py-10">
         <section>
-          <h2 className="text-xl font-semibold tracking-tight">What it is</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">What it is</h2>
           <p className="mt-4 leading-7 text-slate-700 dark:text-slate-300">{pattern.definition}</p>
           <p className="mt-4 whitespace-pre-line leading-7 text-slate-700 dark:text-slate-300">{pattern.explanation}</p>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold tracking-tight">When to use</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">When to use</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 leading-7 text-slate-700 dark:text-slate-300">
             {pattern.when_to_use.map((item) => (
               <li key={item}>{item}</li>
@@ -84,7 +84,7 @@ export default async function EvalDetailPage({ params }: EvalDetailPageProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold tracking-tight">When NOT to use</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">When NOT to use</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 leading-7 text-slate-700 dark:text-slate-300">
             {pattern.when_not_to_use.map((item) => (
               <li key={item}>{item}</li>
@@ -93,12 +93,12 @@ export default async function EvalDetailPage({ params }: EvalDetailPageProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold tracking-tight">Metric or method</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Metric or method</h2>
           <p className="mt-4 leading-7 text-slate-700 dark:text-slate-300">{pattern.metric_or_method}</p>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold tracking-tight">Common pitfalls</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Common pitfalls</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 leading-7 text-slate-700 dark:text-slate-300">
             {pattern.common_pitfalls.map((item) => (
               <li key={item}>{item}</li>
@@ -107,21 +107,21 @@ export default async function EvalDetailPage({ params }: EvalDetailPageProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold tracking-tight">Source excerpt</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Source excerpt</h2>
           <blockquote className="mt-4 border-l-2 border-slate-200 pl-5 text-sm leading-7 text-slate-600 dark:border-slate-700 dark:text-slate-300">
             {pattern.source_excerpt}
           </blockquote>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold tracking-tight">Drop into Codex</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Drop into Codex</h2>
           <div className="mt-4">
             <CodexPromptCopier prompt={pattern.codex_prompt_template} />
           </div>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold tracking-tight">All sources</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">All sources</h2>
           <div className="mt-4">
             <SourceCitation
               source_operator={pattern.source_operator}

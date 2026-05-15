@@ -100,7 +100,7 @@ export function LearnClient({ beginnerPattern, categoryExamples, workedExample, 
 function StepOne({ pattern }: { pattern: EvalPattern }) {
   return (
     <>
-      <h1 className="text-3xl font-semibold tracking-tight">What is an eval?</h1>
+      <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">What is an eval?</h1>
       <div className="mt-6 space-y-4 leading-7 text-slate-700 dark:text-slate-300">
         <p>Traditional software can often be specified in prose: click this, return that, reject those inputs.</p>
         <p>AI products are different. Their outputs are probabilistic, so prose alone cannot fully describe what “good” looks like across the range of real user behavior.</p>
@@ -117,7 +117,7 @@ function StepOne({ pattern }: { pattern: EvalPattern }) {
 function StepTwo({ patterns }: { patterns: EvalPattern[] }) {
   return (
     <>
-      <h1 className="text-3xl font-semibold tracking-tight">The four eval categories</h1>
+      <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">The four eval categories</h1>
       <div className="mt-6 grid gap-5">
         {categories.map(([label, description], index) => (
           <div key={label}>
@@ -141,30 +141,32 @@ function Annotation({ children }: { children: React.ReactNode }) {
 function StepThree({ pattern }: { pattern: EvalPattern }) {
   return (
     <>
-      <h1 className="text-3xl font-semibold tracking-tight">Your first eval, walked through field by field</h1>
+      <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+        Your first eval, walked through field by field
+      </h1>
       <div className="mt-8 space-y-8">
         <section>
-          <h2 className="text-xl font-semibold">{pattern.name}</h2>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{pattern.name}</h2>
           <p className="mt-3 text-slate-700 dark:text-slate-300">{pattern.one_liner}</p>
           <Annotation>the elevator pitch — should make you want to read more</Annotation>
         </section>
         <section>
-          <h3 className="text-lg font-semibold">When to use</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">When to use</h3>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-slate-700 dark:text-slate-300">
             {pattern.when_to_use.map((item) => <li key={item}>{item}</li>)}
           </ul>
           <Annotation>the situations where you reach for this — concrete, not abstract</Annotation>
         </section>
         <section>
-          <h3 className="text-lg font-semibold">Source excerpt</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Source excerpt</h3>
           <blockquote className="mt-3 border-l-2 border-slate-200 pl-5 text-sm leading-7 text-slate-600 dark:border-slate-700 dark:text-slate-300">
             {pattern.source_excerpt}
           </blockquote>
           <Annotation>the source of truth — every claim above must be traceable here</Annotation>
         </section>
         <section>
-          <h3 className="text-lg font-semibold">Codex prompt</h3>
-          <pre className="mt-3 overflow-x-auto rounded-2xl bg-slate-900 p-4 text-sm leading-6 text-slate-100 dark:bg-slate-950">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Codex prompt</h3>
+          <pre className="mt-3 overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm leading-6 text-slate-100">
             <code>{pattern.codex_prompt_template}</code>
           </pre>
           <Annotation>this is what makes the pattern actionable — paste it into Codex/Cursor and substitute the placeholders</Annotation>
@@ -177,7 +179,7 @@ function StepThree({ pattern }: { pattern: EvalPattern }) {
 function StepFour({ pattern }: { pattern: EvalPattern }) {
   return (
     <>
-      <h1 className="text-3xl font-semibold tracking-tight">How to read any pattern</h1>
+      <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">How to read any pattern</h1>
       <div className="relative mt-8 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
         <Chip label="1" className="left-3 top-3" />
         <Chip label="2" className="right-5 top-20" />
@@ -189,7 +191,7 @@ function StepFour({ pattern }: { pattern: EvalPattern }) {
           <CategoryBadge category={pattern.category} />
           <DifficultyBadge difficulty={pattern.difficulty} />
         </div>
-        <h2 className="mt-5 text-2xl font-semibold tracking-tight">{pattern.name}</h2>
+        <h2 className="mt-5 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">{pattern.name}</h2>
         <p className="mt-3 text-slate-700 dark:text-slate-300">{pattern.one_liner}</p>
         <SourceCitation
           source_operator={pattern.source_operator}
@@ -201,7 +203,7 @@ function StepFour({ pattern }: { pattern: EvalPattern }) {
           <p>{pattern.definition}</p>
           <p>{pattern.metric_or_method}</p>
         </div>
-        <pre className="mt-6 overflow-x-auto rounded-2xl bg-slate-900 p-4 text-sm leading-6 text-slate-100 dark:bg-slate-950">
+        <pre className="mt-6 overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm leading-6 text-slate-100">
           <code>{pattern.codex_prompt_template}</code>
         </pre>
       </div>
@@ -224,7 +226,7 @@ function Chip({ label, className }: { label: string; className: string }) {
 function StepFive() {
   return (
     <>
-      <h1 className="text-3xl font-semibold tracking-tight">Where to go next</h1>
+      <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Where to go next</h1>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <NextCard
           title="Browse all patterns"

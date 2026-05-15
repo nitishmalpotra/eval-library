@@ -38,7 +38,9 @@ export function BrowseFilters() {
   return (
     <div className="space-y-8">
       <label className="block">
-        <span className="mb-2 block font-mono text-xs uppercase tracking-[0.16em] text-slate-500">Keyword</span>
+        <span className="mb-2 block font-mono text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+          Keyword
+        </span>
         <input
           value={query}
           onChange={(event) => updateParam("q", event.target.value)}
@@ -48,12 +50,16 @@ export function BrowseFilters() {
       </label>
 
       <section>
-        <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-slate-500">Feature type</h2>
+        <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+          Feature type
+        </h2>
         <FeatureTypeFilter />
       </section>
 
       <section>
-        <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-slate-500">Difficulty</h2>
+        <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+          Difficulty
+        </h2>
         <div className="space-y-2">
           <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
             <input
@@ -79,7 +85,9 @@ export function BrowseFilters() {
       </section>
 
       <section>
-        <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-slate-500">Category</h2>
+        <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+          Category
+        </h2>
         <div className="space-y-2">
           {categories.map((category) => (
             <label key={category} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">

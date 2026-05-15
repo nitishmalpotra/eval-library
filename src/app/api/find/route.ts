@@ -48,11 +48,47 @@ function dotProduct(left: number[], right: number[]) {
   return left.reduce((sum, value, index) => sum + value * right[index], 0);
 }
 
+function isCreditsExhaustedError(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const e = err as {
+    status?: number;
+    code?: string;
+    message?: string;
+    error?: { code?: string; message?: string; type?: string };
+  };
+
+  const status = e.status;
+  const code = e.code || e.error?.code || "";
+  const message = (e.message || e.error?.message || "").toLowerCase();
+  const type = e.error?.type || "";
+
+  if (status === 402) return true;
+  if (code === "insufficient_quota") return true;
+  if (code === "billing_hard_limit_reached") return true;
+  if (type === "insufficient_quota") return true;
+
+  const creditKeywords = [
+    "insufficient balance",
+    "insufficient_quota",
+    "insufficient quota",
+    "insufficient credit",
+    "exceeded your current quota",
+    "payment required",
+    "add credits",
+    "add funds",
+    "balance is insufficient",
+  ];
+  if (creditKeywords.some((kw) => message.includes(kw))) return true;
+
+  return false;
+}
+
 export async function POST(request: Request) {
   try {
     await dataPromise;
 
     const body = await request.json();
+
     const parsedBody = requestSchema.safeParse(body);
 
     if (!parsedBody.success) {
@@ -71,6 +107,11 @@ export async function POST(request: Request) {
 
       queryVector = embeddingResponse.data[0].embedding;
     } catch (error) {
+      if (isCreditsExhaustedError(error)) {
+        console.warn("[find] Credits exhausted — returning soft fail to client.");
+        return Response.json({ creditsExhausted: true }, { status: 200 });
+      }
+
       console.error(error);
       return Response.json({ error: "Model service unavailable, try again" }, { status: 502 });
     }
@@ -128,6 +169,11 @@ export async function POST(request: Request) {
 
       deepSeekContent = completion.choices[0]?.message.content;
     } catch (error) {
+      if (isCreditsExhaustedError(error)) {
+        console.warn("[find] Credits exhausted — returning soft fail to client.");
+        return Response.json({ creditsExhausted: true }, { status: 200 });
+      }
+
       console.error(error);
       return Response.json({ error: "Model service unavailable, try again" }, { status: 502 });
     }

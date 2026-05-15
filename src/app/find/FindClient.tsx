@@ -15,6 +15,7 @@ export function FindClient() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<FindMatch[] | null>(null);
+  const [creditsExhausted, setCreditsExhausted] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
   const patternsById = useMemo(() => new Map(getAllEvals().map((pattern) => [pattern.id, pattern])), []);
 
@@ -26,6 +27,7 @@ export function FindClient() {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
+    setCreditsExhausted(false);
 
     try {
       const response = await fetch("/api/find", {
@@ -35,11 +37,17 @@ export function FindClient() {
         },
         body: JSON.stringify({ query }),
       });
-      const data = (await response.json()) as { error?: string; matches?: ApiFindMatch[] };
+      const data = (await response.json()) as { creditsExhausted?: boolean; error?: string; matches?: ApiFindMatch[] };
 
       if (!response.ok) {
         setResults(null);
         setError(data.error ?? "Unable to find evals right now");
+        return;
+      }
+
+      if (data.creditsExhausted) {
+        setCreditsExhausted(true);
+        setResults(null);
         return;
       }
 
@@ -99,6 +107,49 @@ export function FindClient() {
         </div>
       </form>
 
+      {!isLoading && creditsExhausted && (
+        <section className="my-6 rounded-lg border border-amber-200 bg-amber-50 p-6 dark:border-amber-800 dark:bg-amber-950/30">
+          <p className="text-sm text-amber-700 dark:text-amber-300">DEMO LIMIT REACHED</p>
+          <h2 className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
+            The live demo&apos;s API credits are exhausted for now.
+          </h2>
+          <p className="mt-3 text-slate-700 dark:text-slate-300">
+            The semantic search relies on a paid API and the budget on this hosted demo has run out. The full library is
+            still browseable, and you can keep using the search by self-hosting with your own API keys — instructions in
+            the README take about 5 minutes.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/browse"
+              className="rounded-md bg-blue-600 px-4 py-2.5 text-white transition hover:bg-blue-700 dark:bg-blue-500"
+            >
+              Browse all 73 patterns →
+            </Link>
+            {process.env.NEXT_PUBLIC_REPO_URL ? (
+              <a
+                href={`${process.env.NEXT_PUBLIC_REPO_URL}#quickstart`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-md border border-slate-300 bg-white px-4 py-2.5 text-slate-900 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+              >
+                Self-host with your own keys →
+              </a>
+            ) : (
+              <span className="flex flex-wrap items-center gap-2">
+                <a
+                  href="#"
+                  aria-disabled="true"
+                  className="pointer-events-none rounded-md border border-slate-300 bg-white px-4 py-2.5 text-slate-900 opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                >
+                  Self-host with your own keys →
+                </a>
+                <span className="text-sm text-slate-500 dark:text-slate-400">(repo URL not configured)</span>
+              </span>
+            )}
+          </div>
+        </section>
+      )}
+
       <div ref={resultsRef} className="mt-10 space-y-6">
         {isLoading &&
           Array.from({ length: 3 }).map((_, index) => (
@@ -114,7 +165,7 @@ export function FindClient() {
           </div>
         )}
 
-        {!isLoading && !error && results === null && (
+        {!isLoading && !creditsExhausted && !error && results === null && (
           <p className="text-sm leading-6 text-slate-500 dark:text-slate-400">
             Try: &apos;I&apos;m building an agent that books meetings on my calendar&apos; or &apos;I need evals for a
             RAG-based search over our docs.&apos;

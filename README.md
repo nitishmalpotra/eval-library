@@ -14,9 +14,17 @@ A curated, opinionated library of AI evaluation patterns extracted from Lenny Ra
 - Hosted on Vercel
 
 ## Quickstart
-1. Clone and install: `git clone ... && cd eval-library && npm install`
-2. Copy `.env.example` to `.env.local` and fill in `DEEPSEEK_API_KEY`, `OPENAI_API_KEY`, and `LENNY_CORPUS_PATH`
-3. `npm run dev` to start locally
+The deployed demo uses paid APIs; self-hosting lets you use your own keys.
+
+1. Clone: `git clone <repo-url> && cd eval-library`
+2. Install: `npm install`
+3. Copy env: `cp .env.example .env.local`
+4. Add your keys to `.env.local`:
+   - `DEEPSEEK_API_KEY` — sign up at https://platform.deepseek.com
+   - `OPENAI_API_KEY` — sign up at https://platform.openai.com (only used for embeddings — a few cents)
+5. Run: `npm run dev` and open http://localhost:3000
+
+You do NOT need `LENNY_CORPUS_PATH` unless you're regenerating the data — the extracted patterns and embeddings are already committed in `data/`.
 
 ## Data pipeline (only needed to regenerate the library)
 - `npm run extract:select` — picks files from Lenny's corpus

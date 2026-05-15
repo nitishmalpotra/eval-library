@@ -39,9 +39,6 @@ export default function AboutPage() {
           <p className="text-slate-700 dark:text-slate-300">
             All source content belongs to Lenny Rachitsky. This site presents extracted summaries with attribution and links back to the originals.
           </p>
-          <p className="mt-4 text-slate-700 dark:text-slate-300">
-            If you are Lenny: thank you for the corpus. If anything here is off or you&apos;d like it taken down, please file an issue on GitHub or email [the user can fill this in later].
-          </p>
         </Section>
 
         <Section title="Stack">

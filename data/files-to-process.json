@@ -1,0 +1,256 @@
+{
+  "generated_at": "2026-05-14T23:21:50.683Z",
+  "tier1": [
+    {
+      "file": "newsletters/building-eval-systems-that-improve-your-ai-product.md",
+      "title": "Building eval systems that improve your AI product",
+      "date": "2025-09-09",
+      "guest": "",
+      "word_count": 4662
+    },
+    {
+      "file": "newsletters/beyond-vibe-checks-a-pms-complete-guide-to-evals.md",
+      "title": "Beyond vibe checks: A PM’s complete guide to evals",
+      "date": "2025-04-08",
+      "guest": "",
+      "word_count": 3558
+    },
+    {
+      "file": "podcasts/hamel-husain--shreya-shankar.md",
+      "title": "Why AI evals are the hottest new skill for product builders | Hamel Husain & Shreya Shankar (creators of the #1 eval course)",
+      "date": "2025-09-25",
+      "guest": "Hamel Husain & Shreya Shankar",
+      "word_count": 19671
+    },
+    {
+      "file": "podcasts/brendan-foody.md",
+      "title": "Why experts writing AI evals is creating the fastest-growing companies in history | Brendan Foody (CEO of Mercor)",
+      "date": "2025-09-18",
+      "guest": "Brendan Foody",
+      "word_count": 12143
+    },
+    {
+      "file": "newsletters/counterintuitive-advice-for-building-ai-products.md",
+      "title": "Counterintuitive advice for building AI products",
+      "date": "2024-07-02",
+      "guest": "",
+      "word_count": 3501
+    },
+    {
+      "file": "newsletters/an-ai-glossary.md",
+      "title": "An AI glossary",
+      "date": "2025-06-24",
+      "guest": "",
+      "word_count": 3280
+    },
+    {
+      "file": "newsletters/how-close-is-ai-to-replacing-product-managers.md",
+      "title": "How close is AI to replacing product managers?",
+      "date": "2024-07-09",
+      "guest": "",
+      "word_count": 7120
+    }
+  ],
+  "tier2": [
+    {
+      "file": "podcasts/eli-schwartz.md",
+      "title": "Rethinking SEO in the age of AI | Eli Schwartz (SEO advisor, author)",
+      "date": "2024-09-19",
+      "guest": "Eli Schwartz",
+      "word_count": 23782,
+      "eval_mention_count": 4
+    },
+    {
+      "file": "podcasts/scott-wu.md",
+      "title": "How Devin replaces your junior engineers with infinite AI interns that never sleep | Scott Wu (Cognition CEO)",
+      "date": "2025-09-08",
+      "guest": "Scott Wu",
+      "word_count": 19675,
+      "eval_mention_count": 4
+    },
+    {
+      "file": "podcasts/boris-cherny.md",
+      "title": "Boris Cherny",
+      "date": "2026-02-19",
+      "guest": "Boris Cherny",
+      "word_count": 19629,
+      "eval_mention_count": 5
+    },
+    {
+      "file": "podcasts/nick-turley.md",
+      "title": "Inside ChatGPT: The fastest-growing product in history | Nick Turley (Head of ChatGPT at OpenAI)",
+      "date": "2025-08-09",
+      "guest": "Nick Turley",
+      "word_count": 19233,
+      "eval_mention_count": 8
+    },
+    {
+      "file": "podcasts/howie-liu.md",
+      "title": "How we restructured Airtable’s entire org for AI | Howie Liu (co-founder and CEO)",
+      "date": "2025-08-31",
+      "guest": "Howie Liu",
+      "word_count": 18139,
+      "eval_mention_count": 9
+    },
+    {
+      "file": "podcasts/alexander-embiricos.md",
+      "title": "The power user’s guide to Codex: parallelizing workflows, planning techniques, advanced context engineering tips, automating code reviews, and more | Alexander Embiricos",
+      "date": "2026-01-12",
+      "guest": "Alexander Embiricos",
+      "word_count": 17504,
+      "eval_mention_count": 3
+    },
+    {
+      "file": "podcasts/kevin-weil.md",
+      "title": "OpenAI’s CPO on how AI changes must-have skills, moats, coding, startup playbooks, more | Kevin Weil (CPO at OpenAI, ex-Instagram, Twitter)",
+      "date": "2025-04-10",
+      "guest": "Kevin Weil",
+      "word_count": 17450,
+      "eval_mention_count": 24
+    },
+    {
+      "file": "podcasts/nikhyl-singhal-2.md",
+      "title": "Why half of product managers are in trouble | Nikhyl Singhal (Meta, Google)",
+      "date": "2026-04-19",
+      "guest": "Nikhyl Singhal",
+      "word_count": 17206,
+      "eval_mention_count": 5
+    },
+    {
+      "file": "podcasts/bret-taylor.md",
+      "title": "He saved OpenAI, invented the “Like” button, and built Google Maps: Bret Taylor on the future of careers, coding, agents, and more",
+      "date": "2025-07-31",
+      "guest": "Bret Taylor",
+      "word_count": 16625,
+      "eval_mention_count": 4
+    },
+    {
+      "file": "podcasts/aishwarya-naresh-reganti--kiriti-badam.md",
+      "title": "Aishwarya Naresh Reganti + Kiriti Badam",
+      "date": "2026-01-11",
+      "guest": "Aishwarya Naresh Reganti + Kiriti Badam",
+      "word_count": 16521,
+      "eval_mention_count": 62
+    },
+    {
+      "file": "podcasts/jason-droege.md",
+      "title": "First interview with Scale AI’s CEO: $14B Meta deal, what’s working in enterprise AI, and what frontier labs are building next | Jason Droege",
+      "date": "2025-10-09",
+      "guest": "Jason Droege",
+      "word_count": 16442,
+      "eval_mention_count": 12
+    },
+    {
+      "file": "podcasts/cat-wu.md",
+      "title": "How Anthropic’s product team moves faster than anyone else | Cat Wu (Head of Product, Claude Code)",
+      "date": "2026-04-23",
+      "guest": "Cat Wu",
+      "word_count": 16271,
+      "eval_mention_count": 13
+    },
+    {
+      "file": "podcasts/varun-mohan.md",
+      "title": "Building a magical AI code editor used by over 1 million developers in four months: The untold story of Windsurf | Varun Mohan (co-founder and CEO)",
+      "date": "2025-04-20",
+      "guest": "Varun Mohan",
+      "word_count": 16002,
+      "eval_mention_count": 7
+    },
+    {
+      "file": "podcasts/sherwin-wu-v2.md",
+      "title": "Sherwin Wu V2",
+      "date": "2026-02-12",
+      "guest": "Sherwin Wu V2",
+      "word_count": 15820,
+      "eval_mention_count": 3
+    },
+    {
+      "file": "podcasts/brian-balfour.md",
+      "title": "Brian Balfour: 10 lessons on career, growth, and life",
+      "date": "2023-10-05",
+      "guest": "Brian Balfour",
+      "word_count": 15670,
+      "eval_mention_count": 3
+    },
+    {
+      "file": "podcasts/ryan-hoover.md",
+      "title": "How to launch and grow your product | Ryan Hoover of Product Hunt and Weekend Fund",
+      "date": "2022-08-07",
+      "guest": "Ryan Hoover",
+      "word_count": 15474,
+      "eval_mention_count": 6
+    },
+    {
+      "file": "podcasts/chip-huyen.md",
+      "title": "Al Engineering 101 with Chip Huyen (Nvidia, Stanford, Netflix)",
+      "date": "2025-10-23",
+      "guest": "Chip Huyen",
+      "word_count": 15252,
+      "eval_mention_count": 48
+    },
+    {
+      "file": "podcasts/ethan-smith.md",
+      "title": "The ultimate guide to AEO: How to get ChatGPT to recommend your product | Ethan Smith (Graphite)",
+      "date": "2025-09-14",
+      "guest": "Ethan Smith",
+      "word_count": 14577,
+      "eval_mention_count": 4
+    },
+    {
+      "file": "podcasts/edwin-chen.md",
+      "title": "The 100-person AI lab that became Anthropic and Google's secret weapon | Edwin Chen (Surge AI)",
+      "date": "2025-12-07",
+      "guest": "Edwin Chen",
+      "word_count": 14500,
+      "eval_mention_count": 23
+    },
+    {
+      "file": "podcasts/mike-krieger.md",
+      "title": "Anthropic’s CPO on what comes next | Mike Krieger (co-founder of Instagram)",
+      "date": "2025-06-05",
+      "guest": "Mike Krieger",
+      "word_count": 14007,
+      "eval_mention_count": 3
+    },
+    {
+      "file": "podcasts/garrett-lord.md",
+      "title": "Inside the expert network training every frontier AI model | Garrett Lord (Handshake CEO)",
+      "date": "2025-08-24",
+      "guest": "Garrett Lord",
+      "word_count": 12775,
+      "eval_mention_count": 4
+    },
+    {
+      "file": "podcasts/karina-nguyen.md",
+      "title": "OpenAI researcher on why soft skills are the future of work | Karina Nguyen (Research at OpenAI, ex-Anthropic)",
+      "date": "2025-02-09",
+      "guest": "Karina Nguyen",
+      "word_count": 12135,
+      "eval_mention_count": 30
+    },
+    {
+      "file": "podcasts/asha-sharma.md",
+      "title": "How 80,000 companies build with AI: products as organisms, the death of org charts, and why agents will outnumber employees by 2026 | Asha Sharma (CVP of AI Platform at Microsoft)",
+      "date": "2025-08-28",
+      "guest": "Asha Sharma",
+      "word_count": 10939,
+      "eval_mention_count": 4
+    },
+    {
+      "file": "newsletters/the-definitive-guide-to-mastering-product-sense-interviews.md",
+      "title": "The definitive guide to mastering product sense interviews",
+      "date": "2025-04-01",
+      "guest": "",
+      "word_count": 9102,
+      "eval_mention_count": 12
+    },
+    {
+      "file": "newsletters/how-to-build-ai-product-sense.md",
+      "title": "How to build AI product sense",
+      "date": "2026-02-03",
+      "guest": "",
+      "word_count": 7849,
+      "eval_mention_count": 3
+    }
+  ]
+}

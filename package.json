@@ -1,0 +1,37 @@
+{
+  "name": "eval-library",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "extract:select": "tsx scripts/01-select-files.ts",
+    "extract:patterns": "tsx scripts/02-extract-patterns.ts",
+    "extract:curate": "tsx scripts/03-curate.ts",
+    "extract:embed": "tsx scripts/04-embed.ts",
+    "extract:all": "npm run extract:select && npm run extract:patterns && npm run extract:curate && npm run extract:embed",
+    "refine": "tsx scripts/05-refine.ts"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "next": "^15.5.18",
+    "next-themes": "^0.4.6",
+    "openai": "^6.37.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^15.5.18",
+    "tailwindcss": "^4",
+    "tsx": "^4.22.0",
+    "typescript": "^5"
+  }
+}

@@ -29,9 +29,10 @@ You do NOT need `LENNY_CORPUS_PATH` unless you're regenerating the data — the 
 ## Data pipeline (only needed to regenerate the library)
 - `npm run extract:select` — picks files from Lenny's corpus
 - `npm run extract:patterns` — DeepSeek extraction
-- `npm run extract:curate` — dedup + cluster + bullet cap
+- `npm run extract:curate` — dedup + merge + validate → `data/evals.json`
+- `npm run refine` — DeepSeek pass that tightens each pattern's `one_liner`, `codex_prompt_template`, and `feature_types` in `data/evals.json` (backs up the prior version to `data/evals.pre-refine.json`)
 - `npm run extract:embed` — OpenAI embeddings
-- `npm run extract:all` — runs all four
+- `npm run extract:all` — runs select → patterns → curate → embed (run `refine` separately, before `extract:embed`, when you want it)
 
 ## Attribution
 All source content belongs to Lenny Rachitsky. This project presents extracted summaries and analysis with attribution and direct links back to the originals.

@@ -393,17 +393,18 @@ function buildClusterPrompt(patterns: AnnotatedPattern[]): string {
     }),
   );
 
-  return `Below are AI eval patterns extracted from multiple interviews. Many describe the same underlying pattern under different names. Cluster the patterns by underlying concept. Two patterns belong in the same cluster if they describe the same core technique even if named differently (e.g., 'Error Analysis (open coding)' and 'Error Analysis-First Eval Lifecycle' are the same pattern).
+  return `Below are AI eval patterns extracted from multiple interviews. Some are the SAME technique named differently and should be merged. Many others are RELATED but DISTINCT techniques that must stay separate. This is a browseable library of patterns, so preserve every genuinely distinct, separately-buildable pattern as its own entry.
 
 Output JSON: { "clusters": [{ "canonical_name": "<best name>", "pattern_ids": ["<id1>", "<id2>"], "rationale": "<one sentence>" }] }
 
 Rules:
 - Every pattern must be in exactly one cluster.
-- Singletons (patterns with no semantic duplicates) get their own cluster of size 1.
+- Merge two patterns ONLY when they describe the same actionable technique under a different name or wording (a true duplicate, e.g. 'Error Analysis (open coding)' and 'Open + Axial Coding'). When in doubt, keep them separate.
+- Keep distinct techniques in separate clusters even when they belong to the same broader workflow, lifecycle, or toolchain. For example, "LLM-as-a-Judge", "Calibrating a judge with TPR/TNR", "Error analysis / open coding", "Golden-dataset CI regression testing", "Production monitoring with implicit signals", and "Vibe checks before evals" are RELATED but DISTINCT — each is its own cluster.
+- A pattern that names a separately-buildable method, metric, or step gets its own cluster, even if another pattern references it as part of a larger process.
+- Do NOT merge across different techniques just because they share a theme, lifecycle, or implementation detail.
+- Singletons (patterns with no true duplicate) get their own cluster of size 1.
 - Pick the most precise canonical_name from the cluster members; don't invent new names.
-- Merge naming variants, lifecycle variants, and implementation-detail variants when they express the same underlying eval technique.
-- Do not split clusters just because one member emphasizes process, one emphasizes tooling, or one adds extra implementation detail.
-- Prefer concept-level clusters over wording-level distinctions.
 
 Patterns:
 ${JSON.stringify(patternSummaries)}`;
@@ -421,12 +422,18 @@ async function clusterPatterns(
         process.env.DEEPSEEK_MODEL_PIPELINE ?? process.env.DEEPSEEK_MODEL ?? "deepseek-v4-pro",
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
-      max_tokens: 8_000,
+      // deepseek-v4 models are reasoning models that spend tokens thinking
+      // before emitting the answer. A small cap gets consumed entirely by
+      // reasoning, leaving empty content — so give the call ample headroom.
+      max_tokens: 32_000,
     });
     const content = response.choices[0]?.message.content;
 
     if (!content) {
-      throw new Error("DeepSeek returned an empty clustering response.");
+      const finish = response.choices[0]?.finish_reason;
+      throw new Error(
+        `DeepSeek returned an empty clustering response (finish_reason=${finish}, usage=${JSON.stringify(response.usage)}).`,
+      );
     }
 
     try {
@@ -662,7 +669,12 @@ async function main(): Promise<void> {
   await loadLocalEnv();
 
   const projectRoot = process.cwd();
-  const corpusPath = path.resolve(projectRoot, "..");
+  const corpusPath = process.env.LENNY_CORPUS_PATH;
+
+  if (!corpusPath) {
+    throw new Error("LENNY_CORPUS_PATH env var is required.");
+  }
+
   const extractedDir = path.join(projectRoot, "data", "extracted");
   const index = JSON.parse(
     await readFile(path.join(corpusPath, "index.json"), "utf8"),

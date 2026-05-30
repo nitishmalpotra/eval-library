@@ -272,7 +272,8 @@
       "agency versions",
       "error pattern analysis",
       "evaluation metrics"
-    ]
+    ],
+    "source_url": "https://www.lennysnewsletter.com/p/what-openai-and-google-engineers-learned"
   },
   {
     "name": "DIY Data Inspection Dashboards",
@@ -327,7 +328,7 @@
     ],
     "difficulty": "beginner",
     "definition": "The practice of using evaluations both as training signals (rewarding good performance) and as benchmarks to measure progress and choose the best model version for release.",
-    "explanation": "Evaluations serve a dual role: during training, they provide feedback to improve the model; after training, they enable objective comparison of different checkpoints. Recognizing this distinction helps in designing evaluation pipelines that avoid overfitting and ensure reliable progress tracking.",
+    "explanation": "During training, evaluations provide a reward signal: when the model performs well, that success is used to reinforce good behavior. After training, evaluations shift to benchmarking: measuring progress to objectively pick the best checkpoint for release. Recognizing this dual-purpose distinction is essential for a reliable pipeline. Without separation, using the same evaluation set for both training rewards and selection causes overfitting. The model learns to exploit that specific data, inflating scores without real improvement. Teams should use separate evaluation data for each purpose: one for feedback, another for release decisions. This split ensures the chosen model isn't just the one that best memorized the training signal but actually generalizes. It prevents false confidence and supports trustworthy deployment.",
     "when_to_use": [
       "When building an end-to-end model development pipeline",
       "To clarify the purpose of different evaluation sets",
@@ -644,7 +645,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "A formula for writing LLM eval prompts consisting of four distinct parts: setting the role, providing the context, providing the goal, and defining terminology and labels.",
-    "explanation": "Ensures clarity and specificity in evaluation, translating user expectations into precise criteria for the judge LLM.",
+    "explanation": "The Four-Part Eval Formula ensures LLM-based eval prompts are clear and specific. It structures prompts into four components: first, a role (e.g., “you are examining written text”) to prime the judge; second, the data context to grade (like message chains); third, a precise goal that defines what success and failure look like; and fourth, explicit definitions for labels (e.g., “toxicity”) to ground judgment. By following this structure, teams standardize eval construction and eliminate ambiguity. This matters because vague prompts lead to inconsistent results, while precise, role-based, goal-oriented, and well-defined terminology turns subjective assessments into reliable, repeatable evaluations that align with user expectations.",
     "when_to_use": [
       "When writing LLM-based eval prompts",
       "To standardize eval construction across a team",
@@ -687,7 +688,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "The golden dataset is a purpose-built stress test containing examples covering core features, edge cases, and regression tests for every fixed bug, run automatically on each change.",
-    "explanation": "Integrated into CI, code-based evaluators check outputs against this dataset. A passing build means no known failures have regressed. It's a safety net, not a quality guarantee; it ensures stability.",
+    "explanation": "The golden dataset is a curated test collection that captures your product's most critical scenarios: core features, tricky edge cases, and a regression test for every bug your team has already fixed. Unlike random examples, each entry is chosen to stress-test specific behaviors.\n\nOn every code or prompt change, your CI pipeline automatically re-runs the full system against this dataset. A set of fast, deterministic, code-based evaluators checks each output against the expected result. No human review is needed—the build passes only if there are zero mismatches.\n\nThis acts as a safety net, not a complete quality guarantee. It ensures that previously resolved failures do not return, giving the team confidence that new changes haven't broken stable pathways. It complements, but does not replace, broader evaluation or production monitoring.",
     "when_to_use": [
       "After you have identified and fixed specific failures",
       "To prevent backsliding in production",
@@ -732,7 +733,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "Guardrails are fast, deterministic checks—like regexes, blocklists, or schema validators—that operate synchronously to prevent critical failures in real time.",
-    "explanation": "They are used for high-impact failures where prevention is essential. Must have very low false-positive rate to avoid blocking valid responses. In rare cases, an LLM-as-a-judge can be a guardrail if latency allows.",
+    "explanation": "A guardrail is a synchronous evaluator that blocks, redacts, or regenerates responses for critical failures before users see them. It relies on deterministic checks like regex or blocklists. The key is near-zero false positives: rejecting valid responses hurts trust.\n\nGuardrails are best for high-stakes failures—medical advice, safety violations—where even one miss is unacceptable and rules are unambiguous. For nuanced quality judgments, a slower, more deliberative evaluator is preferred. The decision balances immediate protection against latency and flexibility.",
     "when_to_use": [
       "For critical failures that must never reach the user (e.g., medical advice, safety)",
       "When you need real-time intervention",
@@ -775,7 +776,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "A standard eval that checks if the agent accurately uses provided context (e.g., PDFs) or makes up information.",
-    "explanation": "Helps ensure the AI doesn't hallucinate when given documents to answer from.",
+    "explanation": "A hallucination eval measures whether an AI agent’s answer is faithful to the source material you supply, such as PDFs or knowledge-base articles. You provide the agent with a document and a query, then use an LLM-based judge to compare the answer against the original context. Any claim not directly supported by the reference is flagged as a hallucination. Apply this pattern when the agent must answer from provided documents, especially in factual Q&A where fabrication could mislead or harm users. Avoid it for purely creative tasks or when no reference context exists—otherwise, you’d penalize valid outputs that aren’t tied to a single source.",
     "when_to_use": [
       "When AI uses provided documents or context to answer",
       "For factual Q&A applications",
@@ -860,7 +861,7 @@
     ],
     "difficulty": "beginner",
     "definition": "Human evals are human feedback loops designed into the product, such as thumbs-up/down or comment boxes, or using human labelers to provide labels and feedback.",
-    "explanation": "Directly ties evaluation to end-user satisfaction but can be sparse, noisy, and costly if hiring labelers.",
+    "explanation": "Human evals, like thumbs-up/down buttons or comment boxes next to LLM responses, or hiring human labelers, directly capture end-user satisfaction and subjective judgment. This tight coupling makes them indispensable when aligning with human preferences is critical, such as in RLHF.\n\nIn practice, you feed these human judgments into prompt optimization or fine-tuning loops. The downside: in-product feedback is sparse—most users don't bother—and the signal is ambiguous. What does a thumbs-down really mean? Hiring expert labelers yields richer insights but multiplies cost, making it slower and less scalable.\n\nTurn to human evals when subjective quality matters most and you can afford the investment. Avoid them for fast, high-volume, or objective tasks where automated checks can do the job.",
     "when_to_use": [
       "When user satisfaction is paramount",
       "When subjective assessment is required",
@@ -904,7 +905,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "An iterative workflow for building and refining evals, from gathering data to continuous monitoring in production.",
-    "explanation": "Emphasizes continuous improvement: collect real-world interactions, run initial evals, refine prompts and data, and monitor live performance.",
+    "explanation": "The Iterative Eval Development Workflow breaks eval creation into four phases. During Collection, teams gather representative user interactions and edge cases to form a solid test set. Then, First-pass evaluation runs initial evals to establish a baseline, surfacing obvious weaknesses in the AI’s responses. The Iteration loop follows, where prompts, data, and eval criteria are repeatedly refined against results until performance meets quality bars. Once deployed, Production monitoring continuously tracks live interactions, feeding new examples back into the workflow to prevent drift. Common pitfalls include overcomplicating evals from the start, ignoring edge cases, and failing to validate eval results against real user feedback. Avoiding these keeps evals practical and aligned with actual user needs, making the workflow essential for systematic AI quality improvement.",
     "when_to_use": [
       "When developing a new eval from scratch",
       "When integrating evals into a CI/CD pipeline for AI",
@@ -990,7 +991,7 @@
     ],
     "difficulty": "beginner",
     "definition": "An evaluation method where an online leaderboard displays two anonymized model responses side-by-side and asks users to vote for the better one, aggregating votes to rank models.",
-    "explanation": "As described, users quickly skim responses and pick the one that looks flashier (emojis, bolding, length) without fact-checking, leading to models optimizing for engagement and appearance rather than truth. Highly susceptible to superficial manipulation.",
+    "explanation": "LLM Arena Voting is a crowd-sourced evaluation method where two anonymized model responses are shown side-by-side. Users vote for the response they prefer, and votes are aggregated into public leaderboards that rank models. In practice, as the source excerpt describes, voters skim responses for just a couple of seconds and choose the one that looks flashier—prioritizing bolding, emojis, and length over factual accuracy. Even completely hallucinated answers can win if they are long and visually engaging, creating a strong incentive for models to optimize for superficial appeal. This method is cheap and scales easily, making it useful for quick preference comparisons where surface appeal matters. However, it is highly susceptible to manipulation. When accuracy, safety, or deep expertise are required, LLM Arena-style voting produces rankings that reward style over substance and can profoundly mislead product decisions.",
     "when_to_use": [
       "For comparing model preferences at scale with low cost",
       "For gathering human feedback on subjective tasks where surface appeal matters",
@@ -1159,7 +1160,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "A debugging approach where, upon observing an unexpected model behavior, you prompt the model to reflect on its decision-making process, often revealing ambiguities in the prompt, tool delegation errors, or missing contextual cues.",
-    "explanation": "Cat Wu describes instances where the model takes an action like running tests without using the UI. By asking the model to reflect, she discovered issues like confusing system prompts or subagent failures. This curiosity-driven method helps patch the 'harness' around the model.",
+    "explanation": "When an LLM agent behaves unexpectedly, ask it to reflect on its decision. For instance, if it runs tests without checking the UI, prompt: 'Why did you do that?' The model might reveal confusing system prompts or subagent delegation errors. This introspection exposes what misled the model, so you can fix the harness—the prompts and tools that guide it.\n\nIt turns debugging into a curiosity-driven loop: observe failure, ask why, then patch the instructions to prevent recurrence. This matters because agentic failures are often subtle and not obvious from logs alone. By using the model's own reasoning, you quickly pinpoint root causes, improving system reliability without guesswork.",
     "when_to_use": [
       "When you encounter a surprising model failure that isn't clearly due to a known limitation",
       "When you want to improve prompt/system design based on model's own 'reasoning'",
@@ -1191,7 +1192,8 @@
       "prompt improvement",
       "reflection",
       "agent behavior"
-    ]
+    ],
+    "source_url": "https://www.lennysnewsletter.com/p/how-anthropics-product-team-moves"
   },
   {
     "name": "Off-the-Shelf Metric Mining",
@@ -1204,7 +1206,7 @@
     ],
     "difficulty": "advanced",
     "definition": "Calculate off-the-shelf metrics (hallucination, toxicity, etc.) on traces, then review those with extreme scores to discover patterns.",
-    "explanation": "Instead of displaying generic metric scores on a dashboard, this technique uses them as a diagnostic tool. By sorting traces by high/low scores, you can find unexpected behaviors that inform custom evaluator design. It's an advanced method to be used after mastering basic error analysis.",
+    "explanation": "Off-the-Shelf Metric Mining repurposes noisy metrics like hallucination or toxicity as discovery tools. Instead of showing scores on a dashboard, compute them on traces, then sort and review the extremes. The metrics themselves aren’t reliable enough for direct decisions, but the high and low scorers often flag surprising failures or hidden successes—things your team wouldn’t otherwise look for. Use this after manual error analysis to explore large trace sets. The human review of outliers can uncover patterns that inform custom evaluators. It’s not a substitute for those evaluators, and it requires capacity to review flagged examples. The method works best when you have some confidence the metric will catch relevant signals, even if it’s imperfect.",
     "when_to_use": [
       "After you have established a baseline understanding of your product's failures via manual error analysis",
       "When you want to explore large datasets for hidden patterns",
@@ -1249,7 +1251,7 @@
     ],
     "difficulty": "beginner",
     "definition": "A standard eval that assesses end-to-end effectiveness at the primary task, such as how often the agent correctly answers user questions.",
-    "explanation": "Provides a high-level performance indicator for the system.",
+    "explanation": "Overall correctness evaluation measures how well an AI system performs its primary job. For instance, in question-answering, it tracks how often the agent gives correct answers to user questions. The output is a simple accuracy or correctness score.\n\nThis metric is a reliable end-to-end health check. It shines as a baseline for iterative product improvements—each change’s impact on correctness becomes immediately visible. Because it’s high-level, it won’t explain specific failures. Use it alongside component-level evaluations when you need deeper diagnostics, and avoid it for tasks where correctness is ambiguous, like creative writing.",
     "when_to_use": [
       "When evaluating overall system performance",
       "For question-answering systems",
@@ -1335,7 +1337,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "A process where comprehensive logs of user interactions are sampled and evaluated offline by LLM judges and other validators, with results fed into dashboards.",
-    "explanation": "Because LLM judges may be too slow for real-time, they are run asynchronously. Results are statistically corrected using judge error rates. This monitors quality over time and flags new issues for error analysis.",
+    "explanation": "In production, every user interaction is logged in detail. From these logs, a representative sample is drawn. That sample is evaluated by pre-validated LLM judges and other validators. Because LLM judges are often too slow or costly to run in real time, this evaluation happens asynchronously—after the user’s session ends. The async evaluations generate scores for subjective qualities like tone, relevance, or safety. These scores flow into a monitoring dashboard, giving product managers a near real-time window into production quality without introducing latency into the user experience. By tracking quality trends over time, the system flags when performance drifts or new failure patterns emerge. This pattern is ideal when you’ve already validated your judges and need a scalable way to monitor for nuanced issues that can’t be caught by simple real-time checks.",
     "when_to_use": [
       "When you have validated LLM judges and want to track subjective quality in production",
       "To detect drift or new failure modes",
@@ -1423,7 +1425,7 @@
     ],
     "difficulty": "advanced",
     "definition": "A framework of simulated real-world environments where AI models are deployed to perform end-to-end tasks, interact with various tools and entities, and receive rewards based on their performance, serving both as evaluation benchmarks and training playgrounds.",
-    "explanation": "These environments expose model weaknesses in real-world complexity: messy inputs, novel tools, long time horizons, and interdependent actions. By observing model behavior over entire trajectories, they highlight failures that isolated benchmarks miss and provide rich feedback for improvement.",
+    "explanation": "Reinforcement learning environments are simulations that present AI models with end-to-end tasks mirroring real-world complexity. The model must use tools, plan over long time horizons, and manage interdependent actions. Evaluation works by assigning rewards—positive for good decisions, negative for bad—based on full task execution. This approach reveals failures that only appear in integrated, dynamic settings, such as mishandling novel tools or breaking down on multi-step workflows. Static benchmarks often miss these. For product managers, it offers reliable insight into model readiness for practical deployment and creates focused training feedback.",
     "when_to_use": [
       "To evaluate and improve model performance on complex, real-world tasks",
       "When tasks require planning, tool use, and long-term decision-making",
@@ -1469,7 +1471,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "An evaluation framework that separates RAG assessment into retrieval quality (recall@k) and generation quality (faithfulness to sources and relevance to query).",
-    "explanation": "The retriever is treated as a search problem; recall@k measures if relevant docs are retrieved. Once retrieval is solid, the generator is evaluated on faithfulness (grounding) and answer relevance. Fix retriever first.",
+    "explanation": "Evaluate the retriever first as a search problem using recall@k—a measure of how often relevant documents appear among the top k results. If recall is low, the generator lacks necessary context, so fixing retrieval is the priority. This makes diagnosis actionable: you know exactly where to improve. Once retrieval is solid, assess the generator on faithfulness (is the answer grounded in the sources?) and answer relevance (does it actually address the query?). Splitting evaluation this way lets teams iterate faster, because end-to-end checks alone can’t distinguish retrieval gaps from generation flaws. This method fits any RAG product where you can see intermediate retrieval results.",
     "when_to_use": [
       "For any RAG-based AI product",
       "When end-to-end correctness alone doesn't diagnose issues",
@@ -1512,7 +1514,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "A structured approach where a professional role is broken down into categories and sub-skills, and AI is tested on representative real-world tasks for each skill component to estimate overall job replaceability.",
-    "explanation": "Lenny defined a PM skills framework with categories like Shape the Product, Ship the Product, Sync the People, and sub-skills under each. By aligning benchmark tasks with this taxonomy, one can track what percentage of the PM role is automatable.",
+    "explanation": "This pattern decomposes a professional role into a taxonomy of skill categories and sub-skills, creating a structured map of what the job entails. For product management, Lenny’s framework breaks the role into areas like Shape the Product (e.g., customer discovery), Ship the Product (e.g., launch coordination), and Sync the People (e.g., stakeholder alignment), each with granular sub-skills. In practice, you build benchmark tasks that mirror real, representative work for each sub-skill. AI is tested on these tasks, and performance is scored per component. Aggregating results reveals what percentage of the overall role is currently automatable. This matters because it replaces subjective guesswork with a measurable yardstick. Teams can pinpoint which parts of a job AI handles well and where humans remain essential, guiding decisions on tool adoption, process redesign, and workforce planning.",
     "when_to_use": [
       "When evaluating AI's potential to replace or augment complex human roles",
       "To create a comprehensive, structured benchmark for a profession",
@@ -1631,7 +1633,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "A debugging technique where you take a failing multi-turn interaction and try to reproduce the failure with a direct, single-turn query.",
-    "explanation": "If the system still fails, the problem is likely a simple knowledge or retrieval issue. If it succeeds, the failure is conversational (context loss or misinterpretation). This saves time by quickly pinpointing the root cause.",
+    "explanation": "When a multi-turn conversation produces a failure, it's easy to assume the cause is conversational, like lost context or misinterpretation. Instead, try to reproduce the failure in a single turn: craft a self-contained query that mimics the essential ask from the dialogue. Test this with the model.\n\nIf the model still fails, the root cause is likely a knowledge gap or retrieval issue, not dialogue complexity. If it succeeds on the single turn but failed in conversation, the problem is tied to multi-turn handling, such as context management. This diagnostic quickly narrows down where to focus your fix, saving time otherwise spent on deep, premature multi-turn analysis.",
     "when_to_use": [
       "When analyzing failures in multi-turn chatbots",
       "To quickly narrow down the cause of a failure",
@@ -1708,7 +1710,8 @@
       "iteration",
       "quantify goals",
       "small batch"
-    ]
+    ],
+    "source_url": "https://www.lennysnewsletter.com/p/how-anthropics-product-team-moves"
   },
   {
     "name": "Spreadsheet-Based Ideal Behavior Specification",
@@ -1801,7 +1804,7 @@
     ],
     "difficulty": "beginner",
     "definition": "Evaluation using static datasets with known correct answers, where model outputs are automatically compared to reference answers to compute metrics like accuracy, BLEU, etc.",
-    "explanation": "Benchmarks like MMLU, GSM8K have objective ground truth. Labs optimize models to maximize these scores, but they often have flawed answers, and models can overfit to the benchmark distribution without generalizing to real-world ambiguity.",
+    "explanation": "Standardized benchmark evaluation uses static datasets with correct answers to compute objective metrics automatically. This enables fast, reproducible comparisons and is ideal for tracking progress on tasks with clear right/wrong answers. However, as the source excerpt notes, their well-defined answers let labs 'hill-climb' on scores, optimizing for the test, not real-world ambiguity. Models can win math olympiads yet stumble on parsing PDFs. Benchmarks suit tasks with clear answers and stable data but fail for open-ended tasks or when data shifts or labeling errors exist. Over-optimization causes overfitting, boosting scores but not genuine user value.",
     "when_to_use": [
       "For quick, reproducible comparisons",
       "When the task has clear right/wrong answers",
@@ -1846,7 +1849,7 @@
     ],
     "difficulty": "advanced",
     "definition": "A method to correct the bias in a judge's reported pass/fail rate by accounting for its known false positive and false negative rates.",
-    "explanation": "If a judge has, say, 90% TPR and 95% TNR, you can mathematically adjust the observed pass rate to get a more accurate estimate of the true pass rate. This is mentioned as a way to get more accurate dashboards.",
+    "explanation": "Statistical score correction adjusts a judge’s raw pass/fail counts using its known error rates. Imperfect judges bias the observed failure rate—false negatives hide issues, false positives inflate failures. With the true positive rate (TPR) and true negative rate (TNR), you can mathematically correct this bias to estimate the true underlying rate.\n\nYou apply a formula to the raw evaluation data given the judge’s TPR and TNR. The result approximates a perfect evaluator, giving more accurate metrics for dashboards and high-stakes decisions. This correction is only as good as the error rates; outdated or unreliable numbers can mislead.",
     "when_to_use": [
       "When you need a precise estimate of the true failure rate from an imperfect judge",
       "For high-stakes reporting where accuracy matters"
@@ -1888,7 +1891,7 @@
     ],
     "difficulty": "beginner",
     "definition": "An informal human evaluation method where a small group of experienced users share their immediate, subjective 'vibe' or high-level feedback on a new model iteration, helping surface unexpected behaviors and form hypotheses for further quantitative testing.",
-    "explanation": "Cat Wu's team uses team lunches to quickly poll everyone on their impressions of a new model. Feedback like 'model is too abrupt' or 'loves writing too many memories' helps the team know what data to look at to verify if these are larger patterns. It's a rapid, low-cost complement to formal evals.",
+    "explanation": "Team Vibe Check is a fast, informal method where a group of trusted users gives spontaneous, subjective feedback on a new model. For example, during a team lunch, each person answers 'What's your vibe?' and shares impressions like 'the model is too abrupt' or 'it writes too many memories.' These reactions are aggregated to spot recurring themes and form hypotheses for deeper analysis. This approach is valuable early in testing because it costs nothing and surfaces unexpected behaviors quickly. It then guides what quantitative data to examine—if people feel responses are cut short, you measure response length. It only works when the team knows the product well enough to give nuanced feedback and is not suitable when you need precise metrics or groupthink is a risk.",
     "when_to_use": [
       "Early in the testing phase of a new model or feature",
       "When you need fast, broad feedback before investing in in-depth analysis",
@@ -1921,7 +1924,8 @@
       "model testing",
       "team feedback",
       "impressions"
-    ]
+    ],
+    "source_url": "https://www.lennysnewsletter.com/p/how-anthropics-product-team-moves"
   },
   {
     "name": "Three-Layer Model Safety Evaluation",
@@ -1964,7 +1968,8 @@
       "deployment monitoring",
       "red teaming",
       "synthetic testing"
-    ]
+    ],
+    "source_url": "https://www.lennysnewsletter.com/p/head-of-claude-code-what-happens"
   },
   {
     "name": "Three-Stage Eval Lifecycle",
@@ -1975,7 +1980,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "A framework for AI evaluation consisting of three stages: 1) error analysis to identify failure modes, 2) building automated evaluators to catch those failures, 3) improving the application based on insights, which feeds back into further error analysis.",
-    "explanation": "Shreya describes the course syllabus: they teach a lifecycle starting with error analysis, then building automated evaluators, then how to improve the application, creating a flywheel for continuous improvement.",
+    "explanation": "This method structures AI quality work into three connected stages. First, error analysis helps you find where and why your model fails—by inspecting real outputs, you identify patterns like misclassified edge cases or hallucinations. This isn't just bug-spotting; it's building a map of your system's weaknesses that guides everything else. Second, you turn those insights into automated evaluators—repeatable tests that catch those specific failures quickly at scale. Instead of manually checking every response, you encode your knowledge into assertions, classifiers, or scoring functions that run with every change. Third, you use the data from those evaluators to improve the application: tweak prompts, fine-tune, add guardrails, or redesign features. The improvement step then reveals new gaps, which feeds back into error analysis, creating a flywheel for continuous improvement. This lifecycle matters because ad-hoc testing can't keep up with complex AI systems. It gives product managers a repeatable engine for systematically raising quality over time—not just reacting to failures but preventing them through ever-smarter evaluation and iteration.",
     "when_to_use": [
       "When developing a systematic approach to AI product quality.",
       "When you need to establish a long-term evaluation practice beyond ad-hoc testing."
@@ -2016,7 +2021,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "A standard eval that checks if the agent outputs harmful or undesirable language.",
-    "explanation": "Crucial for end-user facing applications to prevent offensive or toxic responses.",
+    "explanation": "Toxicity/Tone evaluation checks whether an agent’s outputs contain harmful, offensive, or otherwise undesirable language. It typically uses an LLM-based classifier to score responses for toxicity, enabling automated flagging before content reaches users.\n\nThis is essential for any end-user facing application, where a single toxic response can damage trust and brand reputation. Beyond general safety, the eval helps identify when users are attempting to exploit the system, or when the LLM is responding inappropriately, allowing teams to catch both problematic inputs and outputs. It is not necessary for internal tools with no toxic risk or domains where safety concerns are absent, helping teams focus evaluation efforts where they matter most.",
     "when_to_use": [
       "For any end-user facing application",
       "When safety and brand tone are important",
@@ -2060,7 +2065,7 @@
     ],
     "difficulty": "intermediate",
     "definition": "TPR (recall) measures the proportion of actual passes correctly identified; TNR (specificity) measures the proportion of actual fails correctly identified. Together they provide a more complete picture than accuracy.",
-    "explanation": "Accuracy can be misleading when one class dominates. For example, a judge that always predicts 'pass' on a 99% success dataset has 99% accuracy but 0% TNR. Trade-offs between TPR and TNR depend on product context (e.g., medical advice prioritizes TNR to avoid missing harmful outputs).",
+    "explanation": "Relying solely on accuracy to evaluate an AI judge can hide serious blind spots. When one class heavily outweighs the other—say, 99% of outputs pass a safety check—a judge that lazily predicts ‘pass’ for everything will still show 99% accuracy. But it will completely miss all actual failures, yielding a true negative rate (TNR) of zero. This is why the source excerpt warns that a single accuracy score can be dangerously misleading. Instead, measuring true positive rate (TPR) and true negative rate (TNR) together gives a clearer picture of where mistakes happen. TPR tells you how many real passes the judge correctly approves; TNR tells you how many real fails it catches. Viewing both reveals whether the judge is too lenient (low TNR) or too strict (low TPR), which directly impacts risk. Choosing how to balance TPR and TNR depends on your product’s risk profile. In high-stakes domains like medical advice, you might prioritize a high TNR to avoid missing harmful content, even if that means a lower TPR and more false rejections. This pattern is essential whenever you’re validating a binary judge on imbalanced data, but less critical for perfectly balanced datasets or non-binary scores.",
     "when_to_use": [
       "When evaluating any binary classifier-like judge on imbalanced data",
       "To understand the types of errors a judge makes",
@@ -2148,7 +2153,7 @@
     ],
     "difficulty": "advanced",
     "definition": "A transition failure matrix is a chart where rows represent the last successful state and columns represent the failure state, used to pinpoint breakdowns in agent workflows.",
-    "explanation": "By analyzing traces of failed agent interactions, you can map them to transitions (e.g., from 'generating sql' to 'executing sql'). This reveals hotspots, guiding debugging efforts.",
+    "explanation": "When debugging complex agents that fail, overall pass/fail rates hide where breakdowns occur. A transition failure matrix reveals this by mapping each failure to the last successful step (row) and the failure step (column). You log traces from failed runs and tally them: for instance, if an agent fails moving from “generating SQL” to “executing SQL,” you increment that cell. The matrix quickly highlights which transitions suffer the most failures. This diagnostic lets you prioritize fixes on the most common failure paths rather than guessing. It’s useful for multi-step workflows where simple outcome evaluation isn't enough, but it requires detailed step-level logs. Without them, you can’t build the matrix.",
     "when_to_use": [
       "When debugging complex, multi-step agent workflows",
       "To prioritize which agent steps to improve",

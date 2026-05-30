@@ -160,7 +160,8 @@ async function refinePattern(
 ): Promise<{ refinement: Refinement; stats: RefinementStats }> {
   return withRetry(async () => {
     const response = await client.chat.completions.create({
-      model: process.env.DEEPSEEK_MODEL ?? "deepseek-chat",
+      model:
+        process.env.DEEPSEEK_MODEL_PIPELINE ?? process.env.DEEPSEEK_MODEL ?? "deepseek-v4-pro",
       messages: [{ role: "user", content: buildPrompt(pattern) }],
       response_format: { type: "json_object" },
     });

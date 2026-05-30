@@ -109,7 +109,7 @@ SETUP
     baseURL: "https://api.deepseek.com/v1",
   });
   ```
-- Model: `deepseek-chat`.
+- Model: `deepseek-v4-pro` for pipeline extraction/curation/refinement, with live /find using `deepseek-v4-flash`.
 - Use `gray-matter` to strip YAML frontmatter and pull metadata before sending the body to DeepSeek.
 
 PER FILE
@@ -124,7 +124,7 @@ PER FILE
 LOGGING
 - Print one line per file: `[12/27] ✓ podcasts/hamel-husain--shreya-shankar.md → 5 patterns extracted (8.2s)`
 - On error, print `[12/27] ✗ <file> → <error message>` and continue.
-- At end, print summary: total files, total patterns, total cost estimate (rough: $0.27 per million input tokens for deepseek-chat, $1.10 per million output tokens — log estimated cost based on actual token usage from API responses).
+- At end, print summary: total files, total patterns, total cost estimate (rough: $0.27 per million input tokens and $1.10 per million output tokens for DeepSeek; log estimated cost based on actual token usage from API responses).
 
 PARALLELISM
 - Run with concurrency 3 (use Promise.all with batching, or a simple semaphore). Don't hammer the API.
@@ -305,7 +305,7 @@ POST handler logic:
 4. Sort by similarity descending. Take the top 5 candidates.
 5. Look up the corresponding eval patterns from evals.json (by id).
 6. Build a DeepSeek prompt that includes the user's query and a compact summary of the 5 candidates (id, name, one_liner, definition, first 3 when_to_use bullets). Ask DeepSeek to pick the 3 most relevant and write a single-sentence rationale per pick (<25 words). Use JSON mode. The shape of the requested response: { "matches": [{ "id": "...", "rationale": "..." }, ...] }
-7. The DeepSeek model: read from process.env.DEEPSEEK_MODEL, fall back to "deepseek-chat". Temperature 0.3. max_tokens 600.
+7. The DeepSeek model: read from process.env.DEEPSEEK_MODEL, fall back to `deepseek-v4-pro` for build pipeline scripts and `deepseek-v4-flash` for live /find usage. Temperature 0.3. max_tokens 600.
 8. Parse the model's JSON. For each match, look up the eval pattern by id, attach the cosine score from step 4, and return:
 
   {

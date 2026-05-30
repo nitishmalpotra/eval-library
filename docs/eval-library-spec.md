@@ -199,7 +199,7 @@ eval-library/
 
 - **Framework:** Next.js 15 (App Router) + React 19 + TypeScript
 - **Styling:** Tailwind CSS v4 (clean utilitarian — Linear / Vercel aesthetic)
-- **LLM (extraction + RAG synthesis):** DeepSeek API (`deepseek-chat`, OpenAI-compatible at `https://api.deepseek.com/v1`)
+- **LLM (extraction + RAG synthesis):** DeepSeek API (`deepseek-v4-pro` for pipeline extraction/curation/refinement, `deepseek-v4-flash` for live /find usage; OpenAI-compatible at `https://api.deepseek.com/v1`)
 - **Embeddings:** OpenAI `text-embedding-3-small` (cheapest production-grade; ~$0.02/1M tokens)
 - **Search:** In-memory cosine similarity over pre-computed vectors. No vector DB needed for ~60 patterns.
 - **Deployment:** Vercel (free tier)
@@ -219,6 +219,8 @@ eval-library/
 # .env.local
 DEEPSEEK_API_KEY=sk-...
 OPENAI_API_KEY=sk-...               # for embeddings only
+DEEPSEEK_MODEL_PIPELINE=deepseek-v4-pro
+DEEPSEEK_MODEL_RUNTIME=deepseek-v4-flash
 LENNY_CORPUS_PATH=/abs/path/to/lennys-newsletterpodcastdata-all   # used only by scripts/, not at runtime
 NEXT_PUBLIC_SITE_URL=https://...
 ```

@@ -19,18 +19,21 @@ The deployed demo uses paid APIs; self-hosting lets you use your own keys.
 1. Clone: `git clone <repo-url> && cd eval-library`
 2. Install: `npm install`
 3. Copy env: `cp .env.example .env.local`
-4. Add your keys to `.env.local`:
+4. Configure `.env.local`:
    - `DEEPSEEK_API_KEY` — sign up at https://platform.deepseek.com
    - `OPENAI_API_KEY` — sign up at https://platform.openai.com (only used for embeddings — a few cents)
+   - `DEEPSEEK_MODEL_PIPELINE` — optional; model used by extraction/curation/refinement. Default: `deepseek-v4-pro`
+   - `DEEPSEEK_MODEL_RUNTIME` — optional; model used by the live /find endpoint. Default: `deepseek-v4-flash`
+   - `DEEPSEEK_MODEL` — optional fallback for both pipeline and runtime if you prefer a single var
 5. Run: `npm run dev` and open http://localhost:3000
 
 You do NOT need `LENNY_CORPUS_PATH` unless you're regenerating the data — the extracted patterns and embeddings are already committed in `data/`.
 
 ## Data pipeline (only needed to regenerate the library)
 - `npm run extract:select` — picks files from Lenny's corpus
-- `npm run extract:patterns` — DeepSeek extraction
-- `npm run extract:curate` — dedup + merge + validate → `data/evals.json`
-- `npm run refine` — DeepSeek pass that tightens each pattern's `one_liner`, `codex_prompt_template`, and `feature_types` in `data/evals.json` (backs up the prior version to `data/evals.pre-refine.json`)
+- `npm run extract:patterns` — DeepSeek extraction using `DEEPSEEK_MODEL_PIPELINE` (default `deepseek-v4-pro`)
+- `npm run extract:curate` — dedup + merge + validate → `data/evals.json` using `DEEPSEEK_MODEL_PIPELINE`
+- `npm run refine` — DeepSeek pass that tightens each pattern's `one_liner`, `codex_prompt_template`, and `feature_types` in `data/evals.json` (backs up the prior version to `data/evals.pre-refine.json`), using `DEEPSEEK_MODEL_PIPELINE`
 - `npm run extract:embed` — OpenAI embeddings
 - `npm run extract:all` — runs select → patterns → curate → embed (run `refine` separately, before `extract:embed`, when you want it)
 

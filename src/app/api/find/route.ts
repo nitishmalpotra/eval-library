@@ -146,7 +146,8 @@ export async function POST(request: Request) {
 
     try {
       const completion = await deepseek.chat.completions.create({
-        model: process.env.DEEPSEEK_MODEL ?? "deepseek-chat",
+        model:
+          process.env.DEEPSEEK_MODEL_RUNTIME ?? process.env.DEEPSEEK_MODEL ?? "deepseek-v4-flash",
         temperature: 0.3,
         max_tokens: 600,
         response_format: { type: "json_object" },

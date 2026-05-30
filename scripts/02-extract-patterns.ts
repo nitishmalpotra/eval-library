@@ -256,7 +256,8 @@ async function extractChunk(
   message: string,
 ): Promise<{ patterns: EvalPattern[]; stats: ExtractionStats }> {
   const response = await client.chat.completions.create({
-    model: "deepseek-chat",
+    model:
+      process.env.DEEPSEEK_MODEL_PIPELINE ?? process.env.DEEPSEEK_MODEL ?? "deepseek-v4-pro",
     messages: [{ role: "user", content: message }],
     response_format: { type: "json_object" },
   });

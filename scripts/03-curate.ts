@@ -417,7 +417,8 @@ async function clusterPatterns(
 
   for (let attempt = 1; attempt <= 2; attempt += 1) {
     const response = await client.chat.completions.create({
-      model: process.env.DEEPSEEK_MODEL ?? "deepseek-chat",
+      model:
+        process.env.DEEPSEEK_MODEL_PIPELINE ?? process.env.DEEPSEEK_MODEL ?? "deepseek-v4-pro",
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
       max_tokens: 8_000,

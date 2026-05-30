@@ -6,6 +6,8 @@
 
 > **Resolution (2026-05-24):** All findings below have since been fixed — `sources[]` is now schema-validated and rendered (#2), `curation-report.md` regenerated from shipped data (#1), the refine step documented in README + spec (#3), spec §6 file map corrected (#4), the broken companion-doc pointers softened (#5), a `LICENSE` file added (#6), and the `curation_status` reality noted in the spec (#7). The `@vercel/analytics` typecheck failure was just a missing local install (`npm install`), not a code bug. `npm run build` now passes (84/84 pages). This report is retained as the historical record.
 
+> **Update (2026-05-30):** The library was rebuilt on the `deepseek-v4-pro`/`deepseek-v4-flash` models with an improved file selection (Tier 2 ranked by eval-signal density, not word count; CC/CD newsletter promoted to Tier 1). The shipped library is now **43 patterns** (57 raw → 43 after conservative de-duplication), not 73. Every "73" in the body below refers to the pre-rebuild state. Build now passes 54/54 pages.
+
 ---
 
 ## Files reviewed

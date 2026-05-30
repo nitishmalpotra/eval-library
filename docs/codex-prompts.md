@@ -63,13 +63,14 @@ LOGIC
 - Build a TIER 1 list of these exact files (hard-code by filename from Section 5 of the spec):
   1. newsletters/building-eval-systems-that-improve-your-ai-product.md
   2. newsletters/beyond-vibe-checks-a-pms-complete-guide-to-evals.md
-  3. podcasts/hamel-husain--shreya-shankar.md
-  4. podcasts/brendan-foody.md
-  5. newsletters/counterintuitive-advice-for-building-ai-products.md
-  6. newsletters/an-ai-glossary.md
-  7. newsletters/how-close-is-ai-to-replacing-product-managers.md
-- Build a TIER 2 list: every file in `index.json` whose tags include "ai" OR whose title/description contains "eval" (case-insensitive). For each Tier 2 candidate, read the actual .md body and keep only files whose body contains the substring "eval" (case-insensitive) at least 3 times (filters out passing mentions). Skip any file already in Tier 1.
-- Combine: `tier1` files always selected; `tier2` files marked for inclusion. Cap Tier 2 at 25 files (sort by word_count descending) to keep extraction time/cost reasonable.
+  3. newsletters/why-your-ai-product-needs-a-different-development-lifecycle.md
+  4. podcasts/hamel-husain--shreya-shankar.md
+  5. podcasts/brendan-foody.md
+  6. newsletters/counterintuitive-advice-for-building-ai-products.md
+  7. newsletters/an-ai-glossary.md
+  8. newsletters/how-close-is-ai-to-replacing-product-managers.md
+- Build a TIER 2 list: every file in `index.json` whose tags include "ai" OR whose title/description contains "eval" (case-insensitive). For each candidate, read the .md body and compute an **eval-signal score** — standalone "eval(s)" mentions + 4×"LLM-as-a-judge" + 2×compound eval terms ("eval set/framework/pipeline"). Do NOT rank on the bare substring "eval" (it matches "retrieval" and generic "evaluate"). Keep files with genuine signal (≥2 eval mentions or any judge reference). Skip any file already in Tier 1.
+- Combine: `tier1` files always selected; `tier2` files **ranked by eval-signal score** (not word_count), capped at 25.
 
 OUTPUT
 - Write `data/files-to-process.json` with shape:
@@ -84,7 +85,7 @@ OUTPUT
 
 ACCEPTANCE
 - Running `npm run extract:select` produces a valid `data/files-to-process.json`.
-- Tier 1 has all 7 files exactly.
+- Tier 1 has all 8 files exactly.
 - Tier 2 has between 8 and 25 files.
 - Console summary prints.
 
@@ -335,7 +336,7 @@ Layout:
   - Error state: a slim red-bordered alert with the error message and a "Try again" link
   - Empty state (no submission yet): a muted hint "Try: 'I'm building an agent that books meetings on my calendar' or 'I need evals for a RAG-based search over our docs.'"
   - Results state: 3 results stacked. For each, show a slate-600 italic rationale line ("Why this fits:"), then render an EvalCard (reuse the existing component from /browse) below it.
-- Bottom of page (when results shown): a footer link "Not seeing the right pattern? Browse all 73 →" linking to /browse.
+- Bottom of page (when results shown): a footer link "Not seeing the right pattern? Browse all 43 →" linking to /browse.
 
 Client behavior:
 - Use "use client" directive.

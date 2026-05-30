@@ -102,24 +102,17 @@ These have evals as primary topic or in the title. Each should yield 2-6 pattern
 
 1. `newsletters/building-eval-systems-that-improve-your-ai-product.md` (2025-09-09)
 2. `newsletters/beyond-vibe-checks-a-pms-complete-guide-to-evals.md` (2025-04-08)
-3. `podcasts/hamel-husain--shreya-shankar.md` (2025-09-25) — canonical evals episode
-4. `podcasts/brendan-foody.md` (2025-09-18) — expert evals
-5. `newsletters/counterintuitive-advice-for-building-ai-products.md` — Aman Khan / observability
-6. `newsletters/an-ai-glossary.md` — definitions that include eval terms
-7. `newsletters/how-close-is-ai-to-replacing-product-managers.md` (touches evals)
+3. `newsletters/why-your-ai-product-needs-a-different-development-lifecycle.md` (2025-08-19) — CC/CD eval framework
+4. `podcasts/hamel-husain--shreya-shankar.md` (2025-09-25) — canonical evals episode
+5. `podcasts/brendan-foody.md` (2025-09-18) — expert evals
+6. `newsletters/counterintuitive-advice-for-building-ai-products.md` — Aman Khan / observability
+7. `newsletters/an-ai-glossary.md` — definitions that include eval terms
+8. `newsletters/how-close-is-ai-to-replacing-product-managers.md` (touches evals)
 
 ### Tier 2 — AI files where evals appear as a secondary theme
-Sweep AI-tagged podcasts/newsletters for incidental eval content. Look for the substring "eval" (case-insensitive) anywhere in the body, then have the LLM judge whether the passage is a genuine eval pattern worth extracting. Probable yields:
-- `podcasts/cat-wu.md`
-- `podcasts/aman-khan.md`
-- `podcasts/aparna-chennapragada.md`
-- `podcasts/marily-nika.md`
-- `podcasts/claire-vo*.md`
-- `podcasts/simon-willison.md`
-- `podcasts/jeetu-patel.md`
-- `podcasts/sherwin-wu*.md`
+Sweep AI-tagged podcasts/newsletters (or any file with "eval" in its title/description). For each candidate, score the body on **eval-signal density** — standalone "eval(s)" mentions (the term of art), "LLM-as-a-judge" references, and compound terms like "eval set/framework/pipeline" — deliberately ignoring the noisy bare substring "eval" (which also matches "retrieval" and generic "evaluate"). Keep files with genuine signal (≥2 eval mentions or any LLM-as-a-judge reference), **rank by that score** (not word count), and cap at 25. Actual yields include `cat-wu`, `kevin-weil`, `karina-nguyen`, `edwin-chen`, `chip-huyen`, `aishwarya-naresh-reganti--kiriti-badam`, `jason-droege`, `howie-liu`, `nick-turley`, `boris-cherny`.
 
-Target a final library of **30-60 high-quality patterns** for v1.
+Target a final library of **30-60 high-quality patterns** for v1. The current shipped library is **43** (57 raw extractions → 43 after conservative de-duplication).
 
 ---
 

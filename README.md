@@ -4,7 +4,7 @@
 
 [Live demo](https://eval-library.vercel.app)
 
-A curated, opinionated library of AI evaluation patterns extracted from Lenny Rachitsky's newsletter and podcast corpus. Browse 73 patterns, find evals matched to your AI feature via semantic search, and paste pre-engineered prompt templates straight into your workflow. Compatible with Codex, Cursor, Claude Code, ChatGPT, and similar AI tools.
+A curated, opinionated library of AI evaluation patterns extracted from Lenny Rachitsky's newsletter and podcast corpus. Browse 43 patterns, find evals matched to your AI feature via semantic search, and paste pre-engineered prompt templates straight into your workflow. Compatible with Codex, Cursor, Claude Code, ChatGPT, and similar AI tools.
 
 ## Stack
 - Next.js 15 (App Router) + React 19 + TypeScript
@@ -30,7 +30,7 @@ The deployed demo uses paid APIs; self-hosting lets you use your own keys.
 You do NOT need `LENNY_CORPUS_PATH` unless you're regenerating the data — the extracted patterns and embeddings are already committed in `data/`.
 
 ## Data pipeline (only needed to regenerate the library)
-- `npm run extract:select` — picks files from Lenny's corpus
+- `npm run extract:select` — picks the most eval-focused files from Lenny's corpus (Tier 1 hard-coded + Tier 2 ranked by eval-signal density) → `data/files-to-process.json`
 - `npm run extract:patterns` — DeepSeek extraction using `DEEPSEEK_MODEL_PIPELINE` (default `deepseek-v4-pro`)
 - `npm run extract:curate` — dedup + merge + validate → `data/evals.json` using `DEEPSEEK_MODEL_PIPELINE`
 - `npm run refine` — DeepSeek pass that tightens each pattern's `one_liner`, `codex_prompt_template`, and `feature_types` in `data/evals.json` (backs up the prior version to `data/evals.pre-refine.json`), using `DEEPSEEK_MODEL_PIPELINE`

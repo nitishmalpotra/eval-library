@@ -13,7 +13,8 @@
     "extract:embed": "tsx scripts/04-embed.ts",
     "extract:all": "npm run extract:select && npm run extract:patterns && npm run extract:curate && npm run extract:embed",
     "refine": "tsx scripts/05-refine.ts",
-    "backfill": "tsx scripts/06-backfill.ts"
+    "backfill": "tsx scripts/06-backfill.ts",
+    "deepen": "tsx scripts/07-deepen-explanations.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

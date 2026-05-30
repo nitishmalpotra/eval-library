@@ -34,8 +34,10 @@ You do NOT need `LENNY_CORPUS_PATH` unless you're regenerating the data — the 
 - `npm run extract:patterns` — DeepSeek extraction using `DEEPSEEK_MODEL_PIPELINE` (default `deepseek-v4-pro`)
 - `npm run extract:curate` — dedup + merge + validate → `data/evals.json` using `DEEPSEEK_MODEL_PIPELINE`
 - `npm run refine` — DeepSeek pass that tightens each pattern's `one_liner`, `codex_prompt_template`, and `feature_types` in `data/evals.json` (backs up the prior version to `data/evals.pre-refine.json`), using `DEEPSEEK_MODEL_PIPELINE`
+- `npm run backfill` — fills any empty `when_not_to_use` / `common_pitfalls` bullet lists, grounded in each pattern's content (idempotent; backs up to `data/evals.pre-backfill.json`)
+- `npm run deepen` — expands thin (<300 char) `explanation` fields into 2-3 grounded paragraphs (idempotent; backs up to `data/evals.pre-deepen.json`)
 - `npm run extract:embed` — OpenAI embeddings
-- `npm run extract:all` — runs select → patterns → curate → embed (run `refine` separately, before `extract:embed`, when you want it)
+- `npm run extract:all` — runs select → patterns → curate → embed. The quality passes (`refine`, `backfill`, `deepen`) are optional and run separately; run them **before** `extract:embed`, since `refine` and `deepen` change text that feeds the embeddings.
 
 ## Attribution
 All source content belongs to Lenny Rachitsky. This project presents extracted summaries and analysis with attribution and direct links back to the originals.

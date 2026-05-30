@@ -134,17 +134,21 @@ eval-library/
 ├── data/
 │   ├── evals.json                   # Source of truth for all extracted patterns
 │   ├── evals.pre-refine.json        # Backup written by 05-refine.ts
+│   ├── evals.pre-backfill.json      # Backup written by 06-backfill.ts
+│   ├── evals.pre-deepen.json        # Backup written by 07-deepen-explanations.ts
 │   ├── eval-embeddings.json         # One vector per pattern
 │   ├── files-to-process.json        # Output of 01-select-files.ts
 │   ├── curation-report.md           # Output of 03-curate.ts
 │   └── extracted/                   # Raw per-file extraction output (gitignored)
 │                                    # Corpus read via LENNY_CORPUS_PATH env var, not a symlink
 ├── scripts/
-│   ├── 01-select-files.ts           # Choose files to process from corpus
+│   ├── 01-select-files.ts           # Choose files to process (Tier 2 ranked by eval-signal density)
 │   ├── 02-extract-patterns.ts       # DeepSeek extraction pipeline
-│   ├── 03-curate.ts                 # Dedupe, merge, validate
+│   ├── 03-curate.ts                 # Dedupe, merge, validate (conservative clustering)
 │   ├── 04-embed.ts                  # Embeddings via OpenAI text-embedding-3-small
-│   └── 05-refine.ts                 # DeepSeek refinement pass (run before 04-embed)
+│   ├── 05-refine.ts                 # DeepSeek refinement pass (run before 04-embed)
+│   ├── 06-backfill.ts               # Fill empty when_not_to_use / common_pitfalls (idempotent)
+│   └── 07-deepen-explanations.ts    # Expand thin explanations (run before 04-embed)
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx
@@ -304,6 +308,10 @@ The script writes raw extraction output to `data/extracted/<file-id>.json`, then
 
 After curation, an optional refinement pass (`npm run refine`) sends each pattern in `data/evals.json` back to DeepSeek to tighten three weak fields only: `one_liner` (forced under 120 chars), `codex_prompt_template` (must contain at least one `[PLACEHOLDER]`, or be emptied for purely conceptual patterns), and `feature_types` (narrowed to 1–3 specific types, avoiding `general`). All other fields are preserved, `curation_status` is set to `edited`, and the pre-refinement version is backed up to `data/evals.pre-refine.json`. Run this **before** `04-embed.ts` so embeddings reflect the refined text. `extract:all` does **not** include this step.
 
+### Quality passes (`06-backfill.ts`, `07-deepen-explanations.ts`)
+
+Two further optional, idempotent passes repair fields the extraction occasionally leaves weak. **`npm run backfill`** regenerates any empty `when_not_to_use` / `common_pitfalls` bullet lists (grounded in each pattern's curated content); it does not touch embedding text. **`npm run deepen`** expands `explanation` fields shorter than 300 chars into 2–3 grounded paragraphs; because `explanation` feeds the embeddings, run it **before** `04-embed.ts`. Each backs up the prior `data/evals.json` (`evals.pre-backfill.json`, `evals.pre-deepen.json`) and is a no-op when nothing needs fixing. Neither is part of `extract:all`.
+
 ---
 
 ## 11. UI direction — clean utilitarian
@@ -336,7 +344,7 @@ Page-level patterns:
 - `package.json` scripts: `dev`, `build`, `extract`, `curate`, `embed`, `start`
 
 ### Phase 1 — Data extraction (Codex runs the scripts)
-- `scripts/01-select-files.ts` reads `index.json` + the corpus, outputs `data/files-to-process.json` containing Tier 1 (always) + Tier 2 (filtered by substring "eval" in body)
+- `scripts/01-select-files.ts` reads `index.json` + the corpus, outputs `data/files-to-process.json` containing Tier 1 (always) + Tier 2 (gated and ranked by eval-signal density)
 - `scripts/02-extract-patterns.ts` calls DeepSeek per file, writes raw `data/extracted/<id>.json`
 - `scripts/03-curate.ts` merges + dedupes + validates → `data/evals.json`
 - `scripts/04-embed.ts` calls OpenAI per pattern, writes `data/eval-embeddings.json`

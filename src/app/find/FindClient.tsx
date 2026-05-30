@@ -20,6 +20,7 @@ export function FindClient() {
   const [creditsExhausted, setCreditsExhausted] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
   const patternsById = useMemo(() => new Map(getAllEvals().map((pattern) => [pattern.id, pattern])), []);
+  const totalPatterns = patternsById.size;
 
   useEffect(() => {
     setQuery(starterQuery);
@@ -125,7 +126,7 @@ export function FindClient() {
               href="/browse"
               className="rounded-md bg-blue-600 px-4 py-2.5 text-white transition hover:bg-blue-700 dark:bg-blue-500"
             >
-              Browse all 73 patterns →
+              Browse all {totalPatterns} patterns →
             </Link>
             <a
               href={`${repoUrl}#quickstart`}
@@ -173,7 +174,7 @@ export function FindClient() {
       {!isLoading && results && results.length > 0 && (
         <footer className="mt-10">
           <Link href="/browse" className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
-            Not seeing the right pattern? Browse all 73 →
+            Not seeing the right pattern? Browse all {totalPatterns} →
           </Link>
         </footer>
       )}

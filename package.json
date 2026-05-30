@@ -12,7 +12,9 @@
     "extract:curate": "tsx scripts/03-curate.ts",
     "extract:embed": "tsx scripts/04-embed.ts",
     "extract:all": "npm run extract:select && npm run extract:patterns && npm run extract:curate && npm run extract:embed",
-    "refine": "tsx scripts/05-refine.ts"
+    "refine": "tsx scripts/05-refine.ts",
+    "backfill": "tsx scripts/06-backfill.ts",
+    "deepen": "tsx scripts/07-deepen-explanations.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
@@ -23,6 +25,9 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "zod": "^4.4.3"
+  },
+  "overrides": {
+    "postcss": ">=8.5.10"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

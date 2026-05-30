@@ -123,13 +123,26 @@ export default async function EvalDetailPage({ params }: EvalDetailPageProps) {
         <section>
           <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">All sources</h2>
           <div className="mt-4">
-            <SourceCitation
-              source_operator={pattern.source_operator}
-              source_title={pattern.source_title}
-              source_date={pattern.source_date}
-              source_url={pattern.source_url}
-              compact
-            />
+            {(pattern.sources && pattern.sources.length > 0
+              ? pattern.sources
+              : [
+                  {
+                    operator: pattern.source_operator,
+                    title: pattern.source_title,
+                    date: pattern.source_date,
+                    url: pattern.source_url,
+                  },
+                ]
+            ).map((source, index) => (
+              <SourceCitation
+                key={`${source.title}-${source.date}-${index}`}
+                source_operator={source.operator}
+                source_title={source.title}
+                source_date={source.date}
+                source_url={source.url}
+                compact
+              />
+            ))}
           </div>
         </section>
       </article>

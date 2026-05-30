@@ -16,6 +16,15 @@ export const featureTypes = [
 export const categories = ["methodology", "metric", "process", "framework"] as const;
 export const difficulties = ["beginner", "intermediate", "advanced"] as const;
 
+const sourceSchema = z.object({
+  file: z.string(),
+  title: z.string(),
+  date: z.string(),
+  operator: z.string(),
+  url: z.string().url().optional(),
+  excerpt: z.string(),
+});
+
 const evalPatternSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -35,6 +44,7 @@ const evalPatternSchema = z.object({
   source_date: z.string(),
   source_url: z.string().url().optional(),
   source_excerpt: z.string(),
+  sources: z.array(sourceSchema).optional(),
   codex_prompt_template: z.string(),
   keywords: z.array(z.string()),
   curation_status: z.enum(["auto", "verified", "edited"]),

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getAllEvals } from "@/lib/evals";
 
 export const metadata: Metadata = {
   title: "About · AI PM Eval Library",
@@ -8,6 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
+  const patternCount = getAllEvals().length;
+
   return (
     <main className="mx-auto max-w-3xl px-6 py-12 text-slate-950 dark:text-slate-100">
       <div className="space-y-10">
@@ -19,13 +22,13 @@ export default function AboutPage() {
 
         <Section title="How patterns are extracted">
           <ol className="list-decimal space-y-2 pl-5 text-slate-700 dark:text-slate-300">
-            <li>Filter Lenny&apos;s 354 newsletters and 298 podcasts to a tier-1 set explicitly about evals plus a tier-2 sweep of AI-tagged files mentioning “eval”.</li>
+            <li>Filter Lenny&apos;s 357 newsletters and 301 podcasts to a tier-1 set explicitly about evals plus a tier-2 sweep of AI-tagged files, ranked by eval-signal density.</li>
             <li>DeepSeek extracts structured patterns per the schema.</li>
             <li>Semantic clustering merges duplicates across operators.</li>
             <li>A manual curation pass checks quality.</li>
           </ol>
           <p className="mt-5 rounded-2xl bg-slate-50 px-5 py-4 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-400">
-            354 newsletters analyzed · 298 podcasts analyzed · 73 patterns extracted · 12+ operators cited
+            357 newsletters analyzed · 301 podcasts analyzed · {patternCount} patterns extracted · 12+ operators cited
           </p>
         </Section>
 

@@ -133,12 +133,35 @@ OUTPUT JSON:
 { "one_liner": "...", "codex_prompt_template": "...", "feature_types": ["..."] }`;
 }
 
+// The model is asked for a one_liner under 120 chars but occasionally
+// overshoots. Rather than failing the whole run on one long hook, clamp it to
+// the limit at a word boundary.
+function clampOneLiner(value: string): string {
+  const trimmed = value.trim();
+
+  if (trimmed.length <= 119) {
+    return trimmed;
+  }
+
+  const cut = trimmed.slice(0, 118);
+  const lastSpace = cut.lastIndexOf(" ");
+  const base = lastSpace > 80 ? cut.slice(0, lastSpace) : cut;
+
+  return `${base.trimEnd()}…`;
+}
+
 function parseResponse(content: string | null): Refinement {
   if (!content) {
     throw new Error("DeepSeek returned an empty response.");
   }
 
-  return refinementSchema.parse(JSON.parse(content));
+  const raw = JSON.parse(content) as Record<string, unknown>;
+
+  if (typeof raw.one_liner === "string") {
+    raw.one_liner = clampOneLiner(raw.one_liner);
+  }
+
+  return refinementSchema.parse(raw);
 }
 
 async function delay(ms: number): Promise<void> {
@@ -160,7 +183,8 @@ async function refinePattern(
 ): Promise<{ refinement: Refinement; stats: RefinementStats }> {
   return withRetry(async () => {
     const response = await client.chat.completions.create({
-      model: process.env.DEEPSEEK_MODEL ?? "deepseek-chat",
+      model:
+        process.env.DEEPSEEK_MODEL_PIPELINE ?? process.env.DEEPSEEK_MODEL ?? "deepseek-v4-pro",
       messages: [{ role: "user", content: buildPrompt(pattern) }],
       response_format: { type: "json_object" },
     });

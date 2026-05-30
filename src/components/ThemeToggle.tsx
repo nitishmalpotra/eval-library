@@ -21,13 +21,36 @@ export function ThemeToggle() {
       className="flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition hover:text-slate-900 dark:hover:text-slate-100"
     >
       {isDark ? (
-        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
-          <path d="M12 3v2.25M12 18.75V21M21 12h-2.25M5.25 12H3M18.364 5.636l-1.591 1.591M7.227 16.773l-1.591 1.591M18.364 18.364l-1.591-1.591M7.227 7.227 5.636 5.636" />
-          <circle cx="12" cy="12" r="4.25" />
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          className="h-5 w-5"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2" />
+          <path d="M12 20v2" />
+          <path d="m4.93 4.93 1.41 1.41" />
+          <path d="m17.66 17.66 1.41 1.41" />
+          <path d="M2 12h2" />
+          <path d="M20 12h2" />
+          <path d="m6.34 17.66-1.41 1.41" />
+          <path d="m19.07 4.93-1.41 1.41" />
         </svg>
       ) : (
-        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
-          <path d="M21 15.75A8.25 8.25 0 0 1 8.25 3 8.25 8.25 0 1 0 21 15.75Z" />
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          className="h-5 w-5"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
         </svg>
       )}
     </button>

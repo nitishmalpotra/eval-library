@@ -338,7 +338,12 @@
     "codex_prompt_template": "Create a Python script that evaluates a model checkpoint for two distinct purposes: (1) as a training signal, using a reward function based on [REWARD_CRITERIA] to improve the model during training, and (2) as a benchmark measurement, computing [METRIC] on [BENCHMARK_DATASET] for final model selection. The script should load the model from [CHECKPOINT_PATH], run evaluation on [EVAL_DATA_PATH], and log the reward score and benchmark metric to separate files without any overlap. Use separate evaluation data splits if needed.",
     "curation_status": "edited",
     "id": "dual-purpose-evaluations",
-    "when_not_to_use": [],
+    "when_not_to_use": [
+      "In pure research settings where evaluations are only used for measuring progress and no model checkpoint release is planned.",
+      "When separate, dedicated evaluation sets for training feedback and final selection are already in place, making the dual-purpose distinction unnecessary.",
+      "During early prototyping when the goal is to quickly test ideas on small data without a formal deployment pipeline.",
+      "When overfitting to the evaluation set is not a concern and training signals can safely come from the same data used for final model selection."
+    ],
     "common_pitfalls": [
       "Using the same evaluations for both training and checkpoint selection can cause overfitting and inflated performance metrics"
     ],
@@ -557,8 +562,16 @@
     "codex_prompt_template": "Generate an eval harness in Python for [AI_FEATURE] that measures [METRIC] by comparing model outputs against a gold-standard test set at [TEST_SET_PATH]. Use [EVAL_METHOD] for comparison and output a detailed report with pass/fail rates and error analysis.",
     "curation_status": "edited",
     "id": "evals",
-    "when_not_to_use": [],
-    "common_pitfalls": [],
+    "when_not_to_use": [
+      "When you are still defining the problem space and haven't established clear expected outputs for success.",
+      "When the AI's intended behavior is inherently subjective or open-ended (e.g., creative writing, brainstorming), making predefined expected outputs impractical.",
+      "When you need to measure real-world user satisfaction or engagement, which may require live A/B testing rather than static, predefined benchmarks."
+    ],
+    "common_pitfalls": [
+      "Designing evals that only measure one dimension (e.g., correctness) while ignoring safety, helpfulness, or tone, leading to a false sense of quality.",
+      "Using eval datasets that don't reflect the diversity of real-world inputs, causing the model to overfit to a narrow distribution.",
+      "Treating eval pass rates as the absolute final word on model performance without deeply analyzing failure modes or edge cases."
+    ],
     "source_operator": "Lenny Rachitsky",
     "source_file": "newsletters/an-ai-glossary.md",
     "source_title": "An AI glossary",
@@ -1421,7 +1434,12 @@
     "codex_prompt_template": "Generate a reinforcement learning environment for evaluating [MODEL_NAME] on [TASK_DESCRIPTION]. The environment should simulate [DOMAIN] with realistic inputs and tool interfaces. Support tool calls like [LIST_TOOLS] and provide a reward signal after each action based on [REWARD_FUNCTION]. Write an evaluation script that runs [NUM_EPISODES] episodes, logs trajectories, and computes average reward and success rate. Use [GYM_FRAMEWORK] if applicable.",
     "curation_status": "edited",
     "id": "reinforcement-learning-environments",
-    "when_not_to_use": [],
+    "when_not_to_use": [
+      "When evaluating narrow, isolated capabilities that do not involve tool use, long-term planning, or interdependent actions.",
+      "For tasks where a static, labeled dataset provides sufficient evaluation and dynamic simulation overhead is not justified.",
+      "When real-world deployment is feasible and the simulation cannot reproduce critical environmental complexities.",
+      "If the primary objective is fast, low-cost benchmarking without the need to capture emergent, end-to-end failures."
+    ],
     "common_pitfalls": [
       "Models may reward-hack to achieve correct answers without proper reasoning",
       "Evaluating only final outcomes ignores valuable process information in trajectories"
@@ -1559,7 +1577,12 @@
       "Lack of access to domain experts for rubric creation",
       "Early-stage prototyping where quick human feedback is more informative"
     ],
-    "common_pitfalls": [],
+    "common_pitfalls": [
+      "Designing rubrics that are too vague or ambiguous, causing the AI verifier to produce inconsistent or meaningless scores.",
+      "Over-relying on the AI verifier's accuracy without validation against human judgment, risking propagation of errors in evaluation.",
+      "Reward hacking: the model learns to exploit rubric loopholes, producing outputs that score well but lack genuine quality or correctness.",
+      "Failing to iteratively refine the rubric based on observed model outputs and edge cases, leading to stagnant and incomplete evaluation criteria."
+    ],
     "source_operator": "Brendan Foody",
     "source_file": "podcasts/brendan-foody.md",
     "source_title": "Why experts writing AI evals is creating the fastest-growing companies in history | Brendan Foody (CEO of Mercor)",
@@ -2093,7 +2116,12 @@
     "codex_prompt_template": "Write a Python script to evaluate the trajectories in [TRACE_DATA_FILE]. For each trace (a sequence of steps the model took to reach an answer), compute a trajectory score from 0 to 1 based on: [SCORING_CRITERIA] (e.g., efficiency, logical coherence, no reward hacking). Output the scores in [OUTPUT_FORMAT] along with a step-by-step justification.",
     "curation_status": "edited",
     "id": "trajectory-evaluation",
-    "when_not_to_use": [],
+    "when_not_to_use": [
+      "Tasks where only the final answer's correctness matters, and process quality is irrelevant (e.g., open-ended generation, simple fact retrieval).",
+      "When the model's intermediate steps are inaccessible (e.g., black-box API responses without chain-of-thought).",
+      "For single-step tasks where no multi-step trajectory is produced (e.g., direct classification without reasoning).",
+      "When efficiency or hacking is not a concern, and diverse solution paths are acceptable or desired."
+    ],
     "common_pitfalls": [
       "Models may achieve correct answers through random or hackish paths that are hard to distinguish from valid reasoning",
       "Defining good trajectories can be subjective and labor-intensive"

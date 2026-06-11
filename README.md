@@ -9,7 +9,7 @@ A curated, opinionated library of AI evaluation patterns extracted from Lenny Ra
 ## Stack
 - Next.js 15 (App Router) + React 19 + TypeScript
 - Tailwind CSS v4
-- DeepSeek API (extraction + rationale generation)
+- DeepSeek API (extraction + query guardrails/rationale generation)
 - OpenAI text-embedding-3-small (semantic search)
 - Hosted on Vercel
 

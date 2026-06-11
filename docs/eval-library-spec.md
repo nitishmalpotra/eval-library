@@ -34,7 +34,7 @@ Five top-level pages:
 1. **`/` — Home.** Hero + value prop + three entry points: Browse / Learn / Find an eval.
 2. **`/browse` — Browse.** Card grid of all extracted eval patterns. Filter by feature type, difficulty, methodology. Search by keyword.
 3. **`/eval/[id]` — Eval detail.** Full pattern: definition, when-to-use, when-not-to-use, metric/method, pitfalls, source operator with citation, source excerpt, difficulty, Codex prompt template with one-click copy.
-4. **`/find` — Find an eval.** RAG-powered: user describes their AI feature in natural language, gets top 3 recommended eval patterns with a one-line rationale per match.
+4. **`/find` — Find an eval.** RAG-powered: user describes their AI feature in natural language, gets the genuinely relevant eval patterns (1–5, no padding) with a one-line rationale per match. Gibberish, off-topic, or hopelessly vague queries are rejected with reason-specific guidance instead of results.
 5. **`/learn` — Guided tour for aspiring PMs.** A linear, opinionated walkthrough: "What is an eval?" → "The 4 eval categories" → "Your first eval (a worked example)" → "Reading the library." Pulls content from the same eval pattern data, framed differently.
 6. **`/about` — About + methodology.** How the patterns were extracted, attribution to Lenny, source-licensing transparency, link to GitHub repo.
 
@@ -240,20 +240,30 @@ POST /api/find
 1. Embed `query` with OpenAI `text-embedding-3-small`.
 2. Compute cosine similarity vs. every vector in `data/eval-embeddings.json`.
 3. Take top 5 candidates.
-4. Send the candidates' summaries + the user's query to DeepSeek with a prompt that asks: "Pick the 3 most relevant patterns and write a one-sentence rationale per pick."
-5. Return:
+4. Send the candidates' summaries + the user's query to DeepSeek, which first gates the query — leniently, so a short-but-real feature like "a chatbot" passes; only unreadable gibberish, queries too vague to identify any feature, or clearly off-topic input are rejected — and then picks every genuinely relevant pattern (0–5, no padding to a fixed count) with a one-sentence rationale per pick.
+5. Return one of two shapes.
+
+Accepted query:
 
 ```json
 {
+  "queryOk": true,
   "matches": [
     { "id": "llm-as-a-judge", "rationale": "Best for grading freeform helpfulness on a known FAQ.", "score": 0.81 },
-    { "id": "rag-faithfulness", "rationale": "Catches when the bot invents content beyond the source.", "score": 0.79 },
-    { "id": "vibe-check-to-structured-eval", "rationale": "Right starting point if you have zero evals today.", "score": 0.74 }
+    { "id": "rag-faithfulness", "rationale": "Catches when the bot invents content beyond the source.", "score": 0.79 }
   ]
 }
 ```
 
-The page renders the matches as eval cards (linking to `/eval/[id]`) with the rationale shown.
+Rejected query (guardrail):
+
+```json
+{ "queryOk": false, "reason": "gibberish" }
+```
+
+where `reason` is one of `"gibberish" | "too_vague" | "off_topic"`.
+
+The page renders the matches as eval cards (linking to `/eval/[id]`) with the rationale shown. A rejection renders a reason-specific nudge telling the user how to rephrase. An accepted query with zero matches renders an honest empty state ("nothing in the library is a strong match yet") with a link to `/browse`.
 
 ---
 
@@ -357,7 +367,7 @@ Page-level patterns:
 - Codex prompt copy-to-clipboard works
 
 ### Phase 3 — RAG /find
-- `/api/find` returns 3 results in < 3 seconds
+- `/api/find` returns the relevant results (1–5) in < 3 seconds, and rejects gibberish/vague/off-topic queries with a reason
 - `/find` page renders results as small eval cards with rationale
 - Embedding cost per query stays under $0.0001
 

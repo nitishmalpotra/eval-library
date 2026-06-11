@@ -8,6 +8,8 @@
 
 > **Update (2026-05-30):** The library was rebuilt on the `deepseek-v4-pro`/`deepseek-v4-flash` models with an improved file selection (Tier 2 ranked by eval-signal density, not word count; CC/CD newsletter promoted to Tier 1). The shipped library is now **43 patterns** (57 raw → 43 after conservative de-duplication), not 73. Every "73" in the body below refers to the pre-rebuild state. Build now passes 54/54 pages.
 
+> **Update (2026-06-11):** `/api/find` gained query guardrails: the DeepSeek rerank call now judges the query first (rejecting gibberish / too-vague / off-topic input with a `reason`) and returns 1–5 genuinely relevant matches instead of a forced top 3, with an honest empty state when nothing fits. The "top-3" description of the route in the body below refers to the pre-guardrail state; spec §9 has been updated to match.
+
 ---
 
 ## Files reviewed

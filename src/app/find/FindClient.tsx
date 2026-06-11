@@ -8,6 +8,17 @@ import { getAllEvals, type FindMatch } from "@/lib/evals";
 
 type ApiFindMatch = Omit<FindMatch, "pattern">;
 
+type RejectionReason = "gibberish" | "too_vague" | "off_topic";
+
+const rejectionMessages: Record<RejectionReason, string> = {
+  gibberish:
+    "We couldn't read that as a feature description. Describe your AI feature in plain words — what it does and who uses it.",
+  too_vague:
+    "That's too broad to match against the library. Add what the feature does and who uses it — e.g. 'a support chatbot that answers from our help center.'",
+  off_topic:
+    "This finder matches AI features to eval patterns. Describe the AI feature you're building and we'll surface the right evals.",
+};
+
 const repoUrl = process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/nitishmalpotra/eval-library";
 
 export function FindClient() {
@@ -18,6 +29,7 @@ export function FindClient() {
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<FindMatch[] | null>(null);
   const [creditsExhausted, setCreditsExhausted] = useState(false);
+  const [rejection, setRejection] = useState<RejectionReason | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const patternsById = useMemo(() => new Map(getAllEvals().map((pattern) => [pattern.id, pattern])), []);
   const totalPatterns = patternsById.size;
@@ -31,6 +43,7 @@ export function FindClient() {
     setIsLoading(true);
     setError(null);
     setCreditsExhausted(false);
+    setRejection(null);
 
     try {
       const response = await fetch("/api/find", {
@@ -40,7 +53,13 @@ export function FindClient() {
         },
         body: JSON.stringify({ query }),
       });
-      const data = (await response.json()) as { creditsExhausted?: boolean; error?: string; matches?: ApiFindMatch[] };
+      const data = (await response.json()) as {
+        creditsExhausted?: boolean;
+        error?: string;
+        queryOk?: boolean;
+        reason?: RejectionReason;
+        matches?: ApiFindMatch[];
+      };
 
       if (!response.ok) {
         setResults(null);
@@ -50,6 +69,12 @@ export function FindClient() {
 
       if (data.creditsExhausted) {
         setCreditsExhausted(true);
+        setResults(null);
+        return;
+      }
+
+      if (data.queryOk === false) {
+        setRejection(data.reason && data.reason in rejectionMessages ? data.reason : "too_vague");
         setResults(null);
         return;
       }
@@ -83,7 +108,7 @@ export function FindClient() {
           Find an eval for your feature
         </h1>
         <p className="mt-3 text-slate-600 dark:text-slate-400">
-          Describe what you are building. We will surface the three closest patterns from the library.
+          Describe what you are building. We will surface the closest patterns from the library.
         </p>
       </header>
 
@@ -155,11 +180,26 @@ export function FindClient() {
           </div>
         )}
 
-        {!isLoading && !creditsExhausted && !error && results === null && (
+        {!isLoading && rejection && (
+          <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-200">
+            {rejectionMessages[rejection]}
+          </div>
+        )}
+
+        {!isLoading && !creditsExhausted && !error && !rejection && results === null && (
           <p className="text-sm leading-6 text-slate-500 dark:text-slate-400">
             Try: &apos;I&apos;m building an agent that books meetings on my calendar&apos; or &apos;I need evals for a
             RAG-based search over our docs.&apos;
           </p>
+        )}
+
+        {!isLoading && results?.length === 0 && (
+          <div className="rounded-md border border-gray-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
+            We understood your feature, but nothing in the library is a strong match yet.{" "}
+            <Link href="/browse" className="font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
+              Browse all {totalPatterns} patterns →
+            </Link>
+          </div>
         )}
 
         {!isLoading &&

@@ -2,6 +2,8 @@
 
 A sequenced set of prompts to drive Codex through the build. Each prompt is self-contained but references `eval-library-spec.md` (the master spec) — keep that file open in the Codex session.
 
+> **Note (2026-06-11):** This file is the historical build record. The shipped `/find` behavior has since evolved beyond Prompt 7: the DeepSeek call now gates queries (rejecting gibberish / too-vague / off-topic input with a reason) and returns 1–5 genuinely relevant matches instead of a forced top 3. See `eval-library-spec.md` §9 for the current contract.
+
 **How to use:** Run prompts in order. After each prompt, verify the acceptance criteria before moving on. If Codex deviates, paste the acceptance criteria back at it.
 
 **Before you start:**

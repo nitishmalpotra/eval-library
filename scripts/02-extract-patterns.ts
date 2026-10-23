@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
 import { z } from "zod";
-import { models, openrouter, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
+import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
 
 type SourceFile = {
   file: string;
@@ -212,7 +212,7 @@ async function delay(ms: number): Promise<void> {
 async function extractChunk(
   message: string,
 ): Promise<{ patterns: EvalPattern[]; stats: ExtractionStats }> {
-  const response = await openrouter.chat.completions.create(
+  const response = await getOpenRouter().chat.completions.create(
     {
       model: models.pipeline,
       messages: [{ role: "user", content: message }],

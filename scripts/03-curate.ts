@@ -2,7 +2,7 @@ import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
 import { z } from "zod";
-import { models, openrouter, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
+import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
 
 type CorpusEntry = {
   title: string;
@@ -364,7 +364,7 @@ async function clusterPatterns(
   let costUsd = 0;
 
   for (let attempt = 1; attempt <= 2; attempt += 1) {
-    const response = await openrouter.chat.completions.create(
+    const response = await getOpenRouter().chat.completions.create(
       {
         model: models.cluster,
         messages: [{ role: "user", content: prompt }],

@@ -4,17 +4,32 @@ import OpenAI from "openai";
  * Shared OpenRouter client for the /find route and the data scripts.
  * OpenRouter speaks the OpenAI API, so this stays on the `openai` SDK.
  * Do not import this from client components.
+ *
+ * The client is created on first use. Constructing it at import time would
+ * pass `undefined` and the SDK would fall back to `OPENAI_API_KEY`.
  */
-export const openrouter = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
-  timeout: 20_000,
-  maxRetries: 1,
-  defaultHeaders: {
-    "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-    "X-OpenRouter-Title": "AI Eval Field Guide",
-  },
-});
+let openrouter: OpenAI | undefined;
+
+export function getOpenRouter(): OpenAI {
+  const apiKey = process.env.OPENROUTER_API_KEY?.trim();
+
+  if (!apiKey) {
+    throw new Error("OPENROUTER_API_KEY is not set");
+  }
+
+  openrouter ??= new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey,
+    timeout: 20_000,
+    maxRetries: 1,
+    defaultHeaders: {
+      "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+      "X-OpenRouter-Title": "AI Eval Field Guide",
+    },
+  });
+
+  return openrouter;
+}
 
 export const models = {
   triage: process.env.OPENROUTER_MODEL_TRIAGE ?? "anthropic/claude-haiku-5.5",

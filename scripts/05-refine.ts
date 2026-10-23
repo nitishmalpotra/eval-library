@@ -1,7 +1,7 @@
 import { copyFile, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import { models, openrouter, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
+import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
 
 type RefinementStats = {
   inputTokens: number;
@@ -127,7 +127,7 @@ async function refinePattern(
   pattern: EvalPattern,
 ): Promise<{ refinement: Refinement; stats: RefinementStats }> {
   return withRetry(async () => {
-    const response = await openrouter.chat.completions.create(
+    const response = await getOpenRouter().chat.completions.create(
       {
         model: models.pipeline,
         messages: [{ role: "user", content: buildPrompt(pattern) }],

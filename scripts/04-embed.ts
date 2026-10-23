@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import { models, openrouter, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
+import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
 
 const batchSize = 100;
 const dimension = 1_536;
@@ -54,7 +54,7 @@ async function main(): Promise<void> {
   let costUsd = 0;
 
   for (const batch of chunk(patterns, batchSize)) {
-    const response = await openrouter.embeddings.create(
+    const response = await getOpenRouter().embeddings.create(
       {
         model: models.embed,
         input: batch.map(buildEmbeddingText),

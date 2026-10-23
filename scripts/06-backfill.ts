@@ -1,7 +1,7 @@
 import { copyFile, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import { models, openrouter, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
+import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
 
 type BackfillStats = {
   inputTokens: number;
@@ -111,7 +111,7 @@ async function backfillPattern(
   fields: BackfillField[],
 ): Promise<{ filled: Record<BackfillField, string[]>; stats: BackfillStats }> {
   return withRetry(async () => {
-    const response = await openrouter.chat.completions.create(
+    const response = await getOpenRouter().chat.completions.create(
       {
         model: models.pipeline,
         messages: [{ role: "user", content: buildPrompt(pattern, fields) }],

@@ -1,9 +1,8 @@
 import { promises as fs } from "fs";
 import path from "path";
-import type OpenAI from "openai";
 import { z } from "zod";
 import type { EvalPattern } from "@/lib/evals";
-import { models, openrouter, runtimeReasoning } from "@/lib/openrouter";
+import { getOpenRouter, models, runtimeReasoning } from "@/lib/openrouter";
 
 type EvalEmbeddings = {
   vectors: Array<{
@@ -99,10 +98,19 @@ export async function POST(request: Request) {
       return Response.json({ error: message }, { status: 400 });
     }
 
+    let client;
+
+    try {
+      client = getOpenRouter();
+    } catch (error) {
+      console.error(error);
+      return Response.json({ error: "Model service unavailable, try again" }, { status: 502 });
+    }
+
     let queryVector: number[];
 
     try {
-      const embeddingResponse = await openrouter.embeddings.create({
+      const embeddingResponse = await client.embeddings.create({
         model: models.embed,
         input: parsedBody.data.query,
       });
@@ -143,12 +151,13 @@ export async function POST(request: Request) {
     let judgeContent: string | null;
 
     try {
-      const completion = await openrouter.chat.completions.create({
+      const completion = await client.chat.completions.create({
         model: models.runtime,
         temperature: 0.3,
         max_tokens: 800,
         response_format: { type: "json_object" },
-        reasoning: runtimeReasoning,
+        // Models with mandatory reasoning will reject effort "none".
+        ...({ reasoning: runtimeReasoning } as { reasoning: typeof runtimeReasoning }),
         messages: [
           {
             role: "system",
@@ -170,7 +179,7 @@ export async function POST(request: Request) {
             ].join("\n"),
           },
         ],
-      } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
+      });
 
       judgeContent = completion.choices[0]?.message.content;
     } catch (error) {

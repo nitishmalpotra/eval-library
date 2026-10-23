@@ -1,8 +1,9 @@
 import { promises as fs } from "fs";
 import path from "path";
-import OpenAI from "openai";
+import type OpenAI from "openai";
 import { z } from "zod";
 import type { EvalPattern } from "@/lib/evals";
+import { models, openrouter, runtimeReasoning } from "@/lib/openrouter";
 
 type EvalEmbeddings = {
   vectors: Array<{
@@ -17,7 +18,7 @@ const requestSchema = z.object({
 
 const rejectionReasons = ["gibberish", "too_vague", "off_topic"] as const;
 
-const deepSeekResponseSchema = z.object({
+const judgeResponseSchema = z.object({
   query_ok: z.boolean(),
   reason: z.enum(rejectionReasons).nullish(),
   matches: z
@@ -28,15 +29,6 @@ const deepSeekResponseSchema = z.object({
       }),
     )
     .default([]),
-});
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const deepseek = new OpenAI({
-  baseURL: "https://api.deepseek.com/v1",
-  apiKey: process.env.DEEPSEEK_API_KEY,
 });
 
 let evalEmbeddings: EvalEmbeddings;
@@ -110,8 +102,8 @@ export async function POST(request: Request) {
     let queryVector: number[];
 
     try {
-      const embeddingResponse = await openai.embeddings.create({
-        model: "text-embedding-3-small",
+      const embeddingResponse = await openrouter.embeddings.create({
+        model: models.embed,
         input: parsedBody.data.query,
       });
 
@@ -148,15 +140,15 @@ export async function POST(request: Request) {
         when_to_use: pattern.when_to_use.slice(0, 3),
       }));
 
-    let deepSeekContent: string | null;
+    let judgeContent: string | null;
 
     try {
-      const completion = await deepseek.chat.completions.create({
-        model:
-          process.env.DEEPSEEK_MODEL_RUNTIME ?? process.env.DEEPSEEK_MODEL ?? "deepseek-v4-flash",
+      const completion = await openrouter.chat.completions.create({
+        model: models.runtime,
         temperature: 0.3,
         max_tokens: 800,
         response_format: { type: "json_object" },
+        reasoning: runtimeReasoning,
         messages: [
           {
             role: "system",
@@ -178,9 +170,9 @@ export async function POST(request: Request) {
             ].join("\n"),
           },
         ],
-      });
+      } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
 
-      deepSeekContent = completion.choices[0]?.message.content;
+      judgeContent = completion.choices[0]?.message.content;
     } catch (error) {
       if (isCreditsExhaustedError(error)) {
         console.warn("[find] Credits exhausted — returning soft fail to client.");
@@ -191,16 +183,16 @@ export async function POST(request: Request) {
       return Response.json({ error: "Model service unavailable, try again" }, { status: 502 });
     }
 
-    if (!deepSeekContent) {
-      throw new Error("DeepSeek returned an empty response");
+    if (!judgeContent) {
+      throw new Error("The model returned an empty response");
     }
 
-    const deepSeekResponse = deepSeekResponseSchema.parse(JSON.parse(deepSeekContent));
+    const judgeResponse = judgeResponseSchema.parse(JSON.parse(judgeContent));
 
-    if (!deepSeekResponse.query_ok) {
+    if (!judgeResponse.query_ok) {
       return Response.json({
         queryOk: false,
-        reason: deepSeekResponse.reason ?? "too_vague",
+        reason: judgeResponse.reason ?? "too_vague",
       });
     }
 
@@ -208,7 +200,7 @@ export async function POST(request: Request) {
 
     return Response.json({
       queryOk: true,
-      matches: deepSeekResponse.matches
+      matches: judgeResponse.matches
         .filter((match) => scoresById.has(match.id))
         .slice(0, 5)
         .map((match) => ({

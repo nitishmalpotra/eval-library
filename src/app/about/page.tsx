@@ -23,7 +23,7 @@ export default function AboutPage() {
         <Section title="How patterns are extracted">
           <ol className="list-decimal space-y-2 pl-5 text-slate-700 dark:text-slate-300">
             <li>Filter Lenny&apos;s 357 newsletters and 301 podcasts to a tier-1 set explicitly about evals plus a tier-2 sweep of AI-tagged files, ranked by eval-signal density.</li>
-            <li>DeepSeek extracts structured patterns per the schema.</li>
+            <li>An OpenRouter model extracts structured patterns per the schema.</li>
             <li>Semantic clustering merges duplicates across operators.</li>
             <li>A manual curation pass checks quality.</li>
           </ol>
@@ -46,7 +46,7 @@ export default function AboutPage() {
 
         <Section title="Stack">
           <p className="text-slate-700 dark:text-slate-300">
-            Next.js 15, TypeScript, Tailwind v4, DeepSeek for extraction + rationale generation, OpenAI text-embedding-3-small for semantic search. Hosted on Vercel.
+            Next.js 15, TypeScript, Tailwind v4, OpenRouter for extraction, the /find judge, and embeddings (openai/text-embedding-3-small). Hosted on Vercel.
           </p>
         </Section>
 

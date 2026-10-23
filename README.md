@@ -9,8 +9,7 @@ A curated, opinionated library of AI evaluation patterns extracted from Lenny Ra
 ## Stack
 - Next.js 15 (App Router) + React 19 + TypeScript
 - Tailwind CSS v4
-- DeepSeek API (extraction + query guardrails/rationale generation)
-- OpenAI text-embedding-3-small (semantic search)
+- OpenRouter for the /find judge and for embeddings, through the OpenAI SDK
 - Hosted on Vercel
 
 ## Quickstart
@@ -20,23 +19,24 @@ The deployed demo uses paid APIs; self-hosting lets you use your own keys.
 2. Install: `npm install`
 3. Copy env: `cp .env.example .env.local`
 4. Configure `.env.local`:
-   - `DEEPSEEK_API_KEY` — sign up at https://platform.deepseek.com
-   - `OPENAI_API_KEY` — sign up at https://platform.openai.com (only used for embeddings — a few cents)
-   - `DEEPSEEK_MODEL_PIPELINE` — optional; model used by extraction/curation/refinement. Default: `deepseek-v4-pro`
-   - `DEEPSEEK_MODEL_RUNTIME` — optional; model used by the live /find endpoint. Default: `deepseek-v4-flash`
-   - `DEEPSEEK_MODEL` — optional fallback for both pipeline and runtime if you prefer a single var
+   - `OPENROUTER_API_KEY` — create a key at https://openrouter.ai
+   - `OPENROUTER_MODEL_RUNTIME` — optional; model used by the live /find endpoint. Default: `anthropic/claude-haiku-5.5`
+   - `OPENROUTER_MODEL_EMBED` — optional; embeddings model. Default: `openai/text-embedding-3-small`
+   - `OPENROUTER_MODEL_PIPELINE`, `OPENROUTER_MODEL_CLUSTER`, and `OPENROUTER_MODEL_TRIAGE` — optional; used by the data scripts. Defaults are in `.env.example`
+   - `NEXT_PUBLIC_SITE_URL` — optional; sent to OpenRouter as the `HTTP-Referer` header
+   - `NEXT_PUBLIC_REPO_URL` — optional; GitHub link shown in the UI
 5. Run: `npm run dev` and open http://localhost:3000
 
-You do NOT need `LENNY_CORPUS_PATH` unless you're regenerating the data — the extracted patterns and embeddings are already committed in `data/`.
+You do NOT need a corpus checkout unless you're regenerating the data — the extracted patterns and embeddings are already committed in `data/`. The current select, extract, and curate scripts still read `LENNY_CORPUS_PATH`.
 
 ## Data pipeline (only needed to regenerate the library)
 - `npm run extract:select` — picks the most eval-focused files from Lenny's corpus (Tier 1 hard-coded + Tier 2 ranked by eval-signal density) → `data/files-to-process.json`
-- `npm run extract:patterns` — DeepSeek extraction using `DEEPSEEK_MODEL_PIPELINE` (default `deepseek-v4-pro`)
-- `npm run extract:curate` — dedup + merge + validate → `data/evals.json` using `DEEPSEEK_MODEL_PIPELINE`
-- `npm run refine` — DeepSeek pass that tightens each pattern's `one_liner`, `codex_prompt_template`, and `feature_types` in `data/evals.json` (backs up the prior version to `data/evals.pre-refine.json`), using `DEEPSEEK_MODEL_PIPELINE`
+- `npm run extract:patterns` — extraction using `OPENROUTER_MODEL_PIPELINE` (default `anthropic/claude-sonnet-5.5`)
+- `npm run extract:curate` — dedup + merge + validate → `data/evals.json` using `OPENROUTER_MODEL_CLUSTER` (default `anthropic/claude-opus-5.5`)
+- `npm run refine` — pass that tightens each pattern's `one_liner`, `codex_prompt_template`, and `feature_types` in `data/evals.json` (backs up the prior version to `data/evals.pre-refine.json`), using `OPENROUTER_MODEL_PIPELINE`
 - `npm run backfill` — fills any empty `when_not_to_use` / `common_pitfalls` bullet lists, grounded in each pattern's content (idempotent; backs up to `data/evals.pre-backfill.json`)
 - `npm run deepen` — expands thin (<300 char) `explanation` fields into 2-3 grounded paragraphs (idempotent; backs up to `data/evals.pre-deepen.json`)
-- `npm run extract:embed` — OpenAI embeddings
+- `npm run extract:embed` — embeddings via `OPENROUTER_MODEL_EMBED` (default `openai/text-embedding-3-small`)
 - `npm run extract:all` — runs select → patterns → curate → embed. The quality passes (`refine`, `backfill`, `deepen`) are optional and run separately; run them **before** `extract:embed`, since `refine` and `deepen` change text that feeds the embeddings.
 
 ## Attribution

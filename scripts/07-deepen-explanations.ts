@@ -1,11 +1,12 @@
 import { copyFile, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import OpenAI from "openai";
 import { z } from "zod";
+import { models, openrouter, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
 
 type DeepenStats = {
   inputTokens: number;
   outputTokens: number;
+  costUsd: number;
 };
 
 // Explanations shorter than this (chars) get expanded. The extraction step (02)
@@ -15,8 +16,6 @@ type DeepenStats = {
 const lengthThreshold = 300;
 const concurrency = 5;
 const retryDelayMs = 5_000;
-const inputCostPerMillionTokens = 0.27;
-const outputCostPerMillionTokens = 1.1;
 
 const evalPatternSchema = z
   .object({
@@ -33,59 +32,6 @@ const evalPatternSchema = z
 type EvalPattern = z.infer<typeof evalPatternSchema>;
 
 const responseSchema = z.object({ explanation: z.string().min(250).max(1400) });
-
-async function loadLocalEnv(): Promise<void> {
-  const envPath = path.join(process.cwd(), ".env.local");
-
-  try {
-    const envFile = await readFile(envPath, "utf8");
-
-    for (const line of envFile.split(/\r?\n/)) {
-      const trimmed = line.trim();
-
-      if (!trimmed || trimmed.startsWith("#")) {
-        continue;
-      }
-
-      const equalsIndex = trimmed.indexOf("=");
-
-      if (equalsIndex === -1) {
-        continue;
-      }
-
-      const key = trimmed.slice(0, equalsIndex).trim();
-      let value = trimmed.slice(equalsIndex + 1).trim();
-
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
-
-      process.env[key] ??= value;
-    }
-  } catch (error: unknown) {
-    const code =
-      typeof error === "object" && error !== null && "code" in error
-        ? error.code
-        : undefined;
-
-    if (code !== "ENOENT") {
-      throw error;
-    }
-  }
-}
-
-function getRequiredEnv(name: string): string {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`${name} env var is required.`);
-  }
-
-  return value;
-}
 
 function buildPrompt(pattern: EvalPattern): string {
   return `You are deepening the explanation of one entry in a curated AI evaluation pattern library. The current explanation is too short. Rewrite it as 2-3 short paragraphs (roughly 450-800 characters) that a product manager can actually learn from.
@@ -107,7 +53,7 @@ source_excerpt (verbatim, your ground truth): ${pattern.source_excerpt}`;
 
 function parseResponse(content: string | null): string {
   if (!content) {
-    throw new Error("DeepSeek returned an empty response.");
+    throw new Error("The model returned an empty response.");
   }
 
   return responseSchema.parse(JSON.parse(content)).explanation;
@@ -127,22 +73,26 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
 }
 
 async function deepenPattern(
-  client: OpenAI,
   pattern: EvalPattern,
 ): Promise<{ explanation: string; stats: DeepenStats }> {
   return withRetry(async () => {
-    const response = await client.chat.completions.create({
-      model:
-        process.env.DEEPSEEK_MODEL_PIPELINE ?? process.env.DEEPSEEK_MODEL ?? "deepseek-v4-pro",
-      messages: [{ role: "user", content: buildPrompt(pattern) }],
-      response_format: { type: "json_object" },
-    });
+    const response = await openrouter.chat.completions.create(
+      {
+        model: models.pipeline,
+        messages: [{ role: "user", content: buildPrompt(pattern) }],
+        response_format: { type: "json_object" },
+        // Reasoning can consume a small cap and leave empty content.
+        max_tokens: 32_000,
+      },
+      { timeout: pipelineTimeoutMs },
+    );
 
     return {
       explanation: parseResponse(response.choices[0]?.message.content ?? null),
       stats: {
         inputTokens: response.usage?.prompt_tokens ?? 0,
         outputTokens: response.usage?.completion_tokens ?? 0,
+        costUsd: usageCostUsd(response.usage),
       },
     };
   });
@@ -160,8 +110,6 @@ async function runBatch<T>(
 }
 
 async function main(): Promise<void> {
-  await loadLocalEnv();
-
   const dataPath = path.join(process.cwd(), "data", "evals.json");
   const backupPath = path.join(process.cwd(), "data", "evals.pre-deepen.json");
   const patterns = z
@@ -177,24 +125,21 @@ async function main(): Promise<void> {
     return;
   }
 
-  const client = new OpenAI({
-    apiKey: getRequiredEnv("DEEPSEEK_API_KEY"),
-    baseURL: "https://api.deepseek.com/v1",
-  });
   const updated = [...patterns];
-  const totalStats: DeepenStats = { inputTokens: 0, outputTokens: 0 };
+  const totalStats: DeepenStats = { inputTokens: 0, outputTokens: 0, costUsd: 0 };
   let failures = 0;
 
   console.log(`Deepening ${targets.length} explanations under ${lengthThreshold} chars...`);
 
   await runBatch(targets, concurrency, async (target, position) => {
     try {
-      const result = await deepenPattern(client, target.pattern);
+      const result = await deepenPattern(target.pattern);
       const before = target.pattern.explanation.length;
 
       updated[target.index] = { ...target.pattern, explanation: result.explanation };
       totalStats.inputTokens += result.stats.inputTokens;
       totalStats.outputTokens += result.stats.outputTokens;
+      totalStats.costUsd += result.stats.costUsd;
 
       console.log(
         `[${position + 1}/${targets.length}] ✓ ${target.pattern.name} (${before} → ${result.explanation.length} chars)`,
@@ -212,14 +157,11 @@ async function main(): Promise<void> {
   const stillThin = updated.filter(
     (pattern) => pattern.explanation.length < lengthThreshold,
   ).length;
-  const estimatedCost =
-    (totalStats.inputTokens / 1_000_000) * inputCostPerMillionTokens +
-    (totalStats.outputTokens / 1_000_000) * outputCostPerMillionTokens;
 
   console.log(`Deepened: ${targets.length - failures}, failed: ${failures}`);
   console.log(`Explanations still under ${lengthThreshold} chars: ${stillThin}`);
   console.log(
-    `Estimated cost: $${estimatedCost.toFixed(4)} (${totalStats.inputTokens} input tokens, ${totalStats.outputTokens} output tokens).`,
+    `Cost: $${totalStats.costUsd.toFixed(4)} (${totalStats.inputTokens} input tokens, ${totalStats.outputTokens} output tokens).`,
   );
   console.log("Reminder: run `npm run extract:embed` to refresh embeddings.");
 }

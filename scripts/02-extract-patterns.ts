@@ -1,8 +1,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
-import OpenAI from "openai";
 import { z } from "zod";
+import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
 
 type SourceFile = {
   file: string;
@@ -20,6 +20,7 @@ type FilesToProcess = {
 type ExtractionStats = {
   inputTokens: number;
   outputTokens: number;
+  costUsd: number;
 };
 
 const concurrency = 3;
@@ -61,49 +62,6 @@ const responseSchema = z.object({
 });
 
 type EvalPattern = z.infer<typeof evalPatternSchema>;
-
-async function loadLocalEnv(): Promise<void> {
-  const envPath = path.join(process.cwd(), ".env.local");
-
-  try {
-    const envFile = await readFile(envPath, "utf8");
-
-    for (const line of envFile.split(/\r?\n/)) {
-      const trimmed = line.trim();
-
-      if (!trimmed || trimmed.startsWith("#")) {
-        continue;
-      }
-
-      const equalsIndex = trimmed.indexOf("=");
-
-      if (equalsIndex === -1) {
-        continue;
-      }
-
-      const key = trimmed.slice(0, equalsIndex).trim();
-      let value = trimmed.slice(equalsIndex + 1).trim();
-
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
-
-      process.env[key] ??= value;
-    }
-  } catch (error: unknown) {
-    const code =
-      typeof error === "object" && error !== null && "code" in error
-        ? error.code
-        : undefined;
-
-    if (code !== "ENOENT") {
-      throw error;
-    }
-  }
-}
 
 const extractionPrompt = `You are an expert AI Product Manager and technical writer. You are reading an interview transcript or newsletter from Lenny Rachitsky's publication. Your job is to extract every distinct AI EVALUATION PATTERN discussed in the text.
 
@@ -240,7 +198,7 @@ function buildUserMessage(
 
 function parseResponse(content: string | null): EvalPattern[] {
   if (!content) {
-    throw new Error("DeepSeek returned an empty response.");
+    throw new Error("The model returned an empty response.");
   }
 
   const parsed: unknown = JSON.parse(content);
@@ -252,21 +210,25 @@ async function delay(ms: number): Promise<void> {
 }
 
 async function extractChunk(
-  client: OpenAI,
   message: string,
 ): Promise<{ patterns: EvalPattern[]; stats: ExtractionStats }> {
-  const response = await client.chat.completions.create({
-    model:
-      process.env.DEEPSEEK_MODEL_PIPELINE ?? process.env.DEEPSEEK_MODEL ?? "deepseek-v4-pro",
-    messages: [{ role: "user", content: message }],
-    response_format: { type: "json_object" },
-  });
+  const response = await getOpenRouter().chat.completions.create(
+    {
+      model: models.pipeline,
+      messages: [{ role: "user", content: message }],
+      response_format: { type: "json_object" },
+      // Reasoning can consume a small cap and leave empty content.
+      max_tokens: 32_000,
+    },
+    { timeout: pipelineTimeoutMs },
+  );
 
   return {
     patterns: parseResponse(response.choices[0]?.message.content ?? null),
     stats: {
       inputTokens: response.usage?.prompt_tokens ?? 0,
       outputTokens: response.usage?.completion_tokens ?? 0,
+      costUsd: usageCostUsd(response.usage),
     },
   };
 }
@@ -281,7 +243,6 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
 }
 
 async function processFile(
-  client: OpenAI,
   corpusPath: string,
   outputDir: string,
   file: SourceFile,
@@ -293,17 +254,17 @@ async function processFile(
     const metadata = buildMetadata(file, parsed.data);
     const chunks = chunkBody(parsed.content.trim());
     const allPatterns: EvalPattern[] = [];
-    const stats: ExtractionStats = { inputTokens: 0, outputTokens: 0 };
+    const stats: ExtractionStats = { inputTokens: 0, outputTokens: 0, costUsd: 0 };
 
     for (const [chunkIndex, chunk] of chunks.entries()) {
       const result = await extractChunk(
-        client,
         buildUserMessage(metadata, chunk, chunkIndex, chunks.length),
       );
 
       allPatterns.push(...result.patterns);
       stats.inputTokens += result.stats.inputTokens;
       stats.outputTokens += result.stats.outputTokens;
+      stats.costUsd += result.stats.costUsd;
     }
 
     await writeFile(
@@ -327,8 +288,6 @@ async function runBatch<T>(
 }
 
 async function main(): Promise<void> {
-  await loadLocalEnv();
-
   const corpusPath = getRequiredEnv("LENNY_CORPUS_PATH");
   const outputDir = path.join(process.cwd(), "data", "extracted");
   const filesPath = path.join(process.cwd(), "data", "files-to-process.json");
@@ -336,27 +295,24 @@ async function main(): Promise<void> {
     await readFile(filesPath, "utf8"),
   ) as FilesToProcess;
   const files = [...filesToProcess.tier1, ...filesToProcess.tier2];
-  const client = new OpenAI({
-    apiKey: getRequiredEnv("DEEPSEEK_API_KEY"),
-    baseURL: "https://api.deepseek.com/v1",
-  });
 
   await mkdir(outputDir, { recursive: true });
 
   let totalPatterns = 0;
   let succeeded = 0;
   let failed = 0;
-  const totalStats: ExtractionStats = { inputTokens: 0, outputTokens: 0 };
+  const totalStats: ExtractionStats = { inputTokens: 0, outputTokens: 0, costUsd: 0 };
 
   await runBatch(files, concurrency, async (file, index) => {
     const startedAt = Date.now();
 
     try {
-      const result = await processFile(client, corpusPath, outputDir, file);
+      const result = await processFile(corpusPath, outputDir, file);
       const elapsedSeconds = ((Date.now() - startedAt) / 1000).toFixed(1);
       totalPatterns += result.patterns;
       totalStats.inputTokens += result.stats.inputTokens;
       totalStats.outputTokens += result.stats.outputTokens;
+      totalStats.costUsd += result.stats.costUsd;
       succeeded += 1;
 
       console.log(
@@ -371,12 +327,8 @@ async function main(): Promise<void> {
     }
   });
 
-  const estimatedCost =
-    (totalStats.inputTokens / 1_000_000) * 0.27 +
-    (totalStats.outputTokens / 1_000_000) * 1.1;
-
   console.log(
-    `Summary: ${files.length} files, ${succeeded} succeeded, ${failed} failed, ${totalPatterns} patterns, ${totalStats.inputTokens} input tokens, ${totalStats.outputTokens} output tokens, estimated cost $${estimatedCost.toFixed(
+    `Summary: ${files.length} files, ${succeeded} succeeded, ${failed} failed, ${totalPatterns} patterns, ${totalStats.inputTokens} input tokens, ${totalStats.outputTokens} output tokens, cost $${totalStats.costUsd.toFixed(
       4,
     )}.`,
   );

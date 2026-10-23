@@ -7,14 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "extract:select": "tsx scripts/01-select-files.ts",
-    "extract:patterns": "tsx scripts/02-extract-patterns.ts",
-    "extract:curate": "tsx scripts/03-curate.ts",
-    "extract:embed": "tsx scripts/04-embed.ts",
+    "extract:select": "tsx --env-file-if-exists=.env.local scripts/01-select-files.ts",
+    "extract:patterns": "tsx --env-file-if-exists=.env.local scripts/02-extract-patterns.ts",
+    "extract:curate": "tsx --env-file-if-exists=.env.local scripts/03-curate.ts",
+    "extract:embed": "tsx --env-file-if-exists=.env.local scripts/04-embed.ts",
     "extract:all": "npm run extract:select && npm run extract:patterns && npm run extract:curate && npm run extract:embed",
-    "refine": "tsx scripts/05-refine.ts",
-    "backfill": "tsx scripts/06-backfill.ts",
-    "deepen": "tsx scripts/07-deepen-explanations.ts"
+    "refine": "tsx --env-file-if-exists=.env.local scripts/05-refine.ts",
+    "backfill": "tsx --env-file-if-exists=.env.local scripts/06-backfill.ts",
+    "deepen": "tsx --env-file-if-exists=.env.local scripts/07-deepen-explanations.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

@@ -1,17 +1,16 @@
 import { copyFile, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import OpenAI from "openai";
 import { z } from "zod";
+import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
 
 type BackfillStats = {
   inputTokens: number;
   outputTokens: number;
+  costUsd: number;
 };
 
 const concurrency = 5;
 const retryDelayMs = 5_000;
-const inputCostPerMillionTokens = 0.27;
-const outputCostPerMillionTokens = 1.1;
 
 // Bullet-list fields the extraction step (02) occasionally leaves empty. This
 // script regenerates ONLY those, grounded in the pattern's already-curated
@@ -42,59 +41,6 @@ const evalPatternSchema = z
 type EvalPattern = z.infer<typeof evalPatternSchema>;
 
 const bulletListSchema = z.array(z.string().min(8)).min(2).max(4);
-
-async function loadLocalEnv(): Promise<void> {
-  const envPath = path.join(process.cwd(), ".env.local");
-
-  try {
-    const envFile = await readFile(envPath, "utf8");
-
-    for (const line of envFile.split(/\r?\n/)) {
-      const trimmed = line.trim();
-
-      if (!trimmed || trimmed.startsWith("#")) {
-        continue;
-      }
-
-      const equalsIndex = trimmed.indexOf("=");
-
-      if (equalsIndex === -1) {
-        continue;
-      }
-
-      const key = trimmed.slice(0, equalsIndex).trim();
-      let value = trimmed.slice(equalsIndex + 1).trim();
-
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
-
-      process.env[key] ??= value;
-    }
-  } catch (error: unknown) {
-    const code =
-      typeof error === "object" && error !== null && "code" in error
-        ? error.code
-        : undefined;
-
-    if (code !== "ENOENT") {
-      throw error;
-    }
-  }
-}
-
-function getRequiredEnv(name: string): string {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`${name} env var is required.`);
-  }
-
-  return value;
-}
 
 function missingFields(pattern: EvalPattern): BackfillField[] {
   return backfillableFields.filter((field) => pattern[field].length === 0);
@@ -134,7 +80,7 @@ function parseResponse(
   fields: BackfillField[],
 ): Record<BackfillField, string[]> {
   if (!content) {
-    throw new Error("DeepSeek returned an empty response.");
+    throw new Error("The model returned an empty response.");
   }
 
   const raw = JSON.parse(content) as Record<string, unknown>;
@@ -161,23 +107,27 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
 }
 
 async function backfillPattern(
-  client: OpenAI,
   pattern: EvalPattern,
   fields: BackfillField[],
 ): Promise<{ filled: Record<BackfillField, string[]>; stats: BackfillStats }> {
   return withRetry(async () => {
-    const response = await client.chat.completions.create({
-      model:
-        process.env.DEEPSEEK_MODEL_PIPELINE ?? process.env.DEEPSEEK_MODEL ?? "deepseek-v4-pro",
-      messages: [{ role: "user", content: buildPrompt(pattern, fields) }],
-      response_format: { type: "json_object" },
-    });
+    const response = await getOpenRouter().chat.completions.create(
+      {
+        model: models.pipeline,
+        messages: [{ role: "user", content: buildPrompt(pattern, fields) }],
+        response_format: { type: "json_object" },
+        // Reasoning can consume a small cap and leave empty content.
+        max_tokens: 32_000,
+      },
+      { timeout: pipelineTimeoutMs },
+    );
 
     return {
       filled: parseResponse(response.choices[0]?.message.content ?? null, fields),
       stats: {
         inputTokens: response.usage?.prompt_tokens ?? 0,
         outputTokens: response.usage?.completion_tokens ?? 0,
+        costUsd: usageCostUsd(response.usage),
       },
     };
   });
@@ -195,8 +145,6 @@ async function runBatch<T>(
 }
 
 async function main(): Promise<void> {
-  await loadLocalEnv();
-
   const dataPath = path.join(process.cwd(), "data", "evals.json");
   const backupPath = path.join(process.cwd(), "data", "evals.pre-backfill.json");
   const patterns = z
@@ -212,21 +160,18 @@ async function main(): Promise<void> {
     return;
   }
 
-  const client = new OpenAI({
-    apiKey: getRequiredEnv("DEEPSEEK_API_KEY"),
-    baseURL: "https://api.deepseek.com/v1",
-  });
   const updated = [...patterns];
-  const totalStats: BackfillStats = { inputTokens: 0, outputTokens: 0 };
+  const totalStats: BackfillStats = { inputTokens: 0, outputTokens: 0, costUsd: 0 };
   let failures = 0;
 
   await runBatch(targets, concurrency, async (target, position) => {
     try {
-      const result = await backfillPattern(client, target.pattern, target.fields);
+      const result = await backfillPattern(target.pattern, target.fields);
 
       updated[target.index] = { ...target.pattern, ...result.filled };
       totalStats.inputTokens += result.stats.inputTokens;
       totalStats.outputTokens += result.stats.outputTokens;
+      totalStats.costUsd += result.stats.costUsd;
 
       console.log(
         `[${position + 1}/${targets.length}] ✓ ${target.pattern.name} → ${target.fields.join(", ")}`,
@@ -242,15 +187,12 @@ async function main(): Promise<void> {
   await writeFile(dataPath, `${JSON.stringify(updated, null, 2)}\n`);
 
   const stillEmpty = updated.filter((pattern) => missingFields(pattern).length > 0).length;
-  const estimatedCost =
-    (totalStats.inputTokens / 1_000_000) * inputCostPerMillionTokens +
-    (totalStats.outputTokens / 1_000_000) * outputCostPerMillionTokens;
 
   console.log(`Patterns needing backfill: ${targets.length}`);
   console.log(`Backfilled: ${targets.length - failures}, failed: ${failures}`);
   console.log(`Patterns still missing a field: ${stillEmpty}`);
   console.log(
-    `Estimated cost: $${estimatedCost.toFixed(4)} (${totalStats.inputTokens} input tokens, ${totalStats.outputTokens} output tokens).`,
+    `Cost: $${totalStats.costUsd.toFixed(4)} (${totalStats.inputTokens} input tokens, ${totalStats.outputTokens} output tokens).`,
   );
 }
 

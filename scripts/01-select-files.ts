@@ -1,49 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-async function loadLocalEnv(): Promise<void> {
-  const envPath = path.join(process.cwd(), ".env.local");
-
-  try {
-    const envFile = await readFile(envPath, "utf8");
-
-    for (const line of envFile.split(/\r?\n/)) {
-      const trimmed = line.trim();
-
-      if (!trimmed || trimmed.startsWith("#")) {
-        continue;
-      }
-
-      const equalsIndex = trimmed.indexOf("=");
-
-      if (equalsIndex === -1) {
-        continue;
-      }
-
-      const key = trimmed.slice(0, equalsIndex).trim();
-      let value = trimmed.slice(equalsIndex + 1).trim();
-
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
-
-      process.env[key] ??= value;
-    }
-  } catch (error: unknown) {
-    const code =
-      typeof error === "object" && error !== null && "code" in error
-        ? error.code
-        : undefined;
-
-    if (code !== "ENOENT") {
-      throw error;
-    }
-  }
-}
-
 type CorpusEntry = {
   title: string;
   filename: string;
@@ -153,7 +110,6 @@ function scoreEvalSignal(body: string): EvalSignal {
 }
 
 async function main(): Promise<void> {
-  await loadLocalEnv();
   const corpusPath = getCorpusPath();
   const indexPath = path.join(corpusPath, "index.json");
   const index = JSON.parse(await readFile(indexPath, "utf8")) as CorpusIndex;

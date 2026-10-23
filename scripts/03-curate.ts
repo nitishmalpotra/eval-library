@@ -1,8 +1,8 @@
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
-import OpenAI from "openai";
 import { z } from "zod";
+import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
 
 type CorpusEntry = {
   title: string;
@@ -109,59 +109,6 @@ function slugify(name: string): string {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "") || "pattern"
   );
-}
-
-async function loadLocalEnv(): Promise<void> {
-  const envPath = path.join(process.cwd(), ".env.local");
-
-  try {
-    const envFile = await readFile(envPath, "utf8");
-
-    for (const line of envFile.split(/\r?\n/)) {
-      const trimmed = line.trim();
-
-      if (!trimmed || trimmed.startsWith("#")) {
-        continue;
-      }
-
-      const equalsIndex = trimmed.indexOf("=");
-
-      if (equalsIndex === -1) {
-        continue;
-      }
-
-      const key = trimmed.slice(0, equalsIndex).trim();
-      let value = trimmed.slice(equalsIndex + 1).trim();
-
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
-
-      process.env[key] ??= value;
-    }
-  } catch (error: unknown) {
-    const code =
-      typeof error === "object" && error !== null && "code" in error
-        ? error.code
-        : undefined;
-
-    if (code !== "ENOENT") {
-      throw error;
-    }
-  }
-}
-
-function getRequiredEnv(name: string): string {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`${name} env var is required.`);
-  }
-
-  return value;
 }
 
 function uniqueStrings(values: string[]): string[] {
@@ -411,28 +358,31 @@ ${JSON.stringify(patternSummaries)}`;
 }
 
 async function clusterPatterns(
-  client: OpenAI,
   patterns: AnnotatedPattern[],
-): Promise<Cluster[]> {
+): Promise<{ clusters: Cluster[]; costUsd: number }> {
   let prompt = buildClusterPrompt(patterns);
+  let costUsd = 0;
 
   for (let attempt = 1; attempt <= 2; attempt += 1) {
-    const response = await client.chat.completions.create({
-      model:
-        process.env.DEEPSEEK_MODEL_PIPELINE ?? process.env.DEEPSEEK_MODEL ?? "deepseek-v4-pro",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-      // deepseek-v4 models are reasoning models that spend tokens thinking
-      // before emitting the answer. A small cap gets consumed entirely by
-      // reasoning, leaving empty content — so give the call ample headroom.
-      max_tokens: 32_000,
-    });
+    const response = await getOpenRouter().chat.completions.create(
+      {
+        model: models.cluster,
+        messages: [{ role: "user", content: prompt }],
+        response_format: { type: "json_object" },
+        // Reasoning models spend tokens thinking before emitting the answer.
+        // A small cap gets consumed entirely by reasoning, leaving empty content,
+        // so give the call ample headroom.
+        max_tokens: 32_000,
+      },
+      { timeout: pipelineTimeoutMs },
+    );
+    costUsd += usageCostUsd(response.usage);
     const content = response.choices[0]?.message.content;
 
     if (!content) {
       const finish = response.choices[0]?.finish_reason;
       throw new Error(
-        `DeepSeek returned an empty clustering response (finish_reason=${finish}, usage=${JSON.stringify(response.usage)}).`,
+        `The model returned an empty clustering response (finish_reason=${finish}, usage=${JSON.stringify(response.usage)}).`,
       );
     }
 
@@ -445,7 +395,7 @@ async function clusterPatterns(
         patterns,
       );
       validateClusters(clusters, patterns);
-      return clusters;
+      return { clusters, costUsd };
     } catch (error: unknown) {
       if (attempt === 2) {
         throw error;
@@ -463,9 +413,8 @@ Return a corrected JSON object where every pattern id appears exactly once and o
 }
 
 async function clusterPatternBatch(
-  client: OpenAI,
   patterns: AnnotatedPattern[],
-): Promise<Cluster[]> {
+): Promise<{ clusters: Cluster[]; costUsd: number }> {
   const batchPatterns = patterns.map((pattern, index) => ({
     ...pattern,
     rawId: `pattern-${String(index + 1).padStart(3, "0")}`,
@@ -473,20 +422,23 @@ async function clusterPatternBatch(
   const originalIdsByBatchId = new Map(
     batchPatterns.map((pattern, index) => [pattern.rawId, patterns[index].rawId]),
   );
-  const clusters = await clusterPatterns(client, batchPatterns);
+  const { clusters, costUsd } = await clusterPatterns(batchPatterns);
 
-  return clusters.map((cluster) => ({
-    ...cluster,
-    pattern_ids: cluster.pattern_ids.map((id) => {
-      const originalId = originalIdsByBatchId.get(id);
+  return {
+    costUsd,
+    clusters: clusters.map((cluster) => ({
+      ...cluster,
+      pattern_ids: cluster.pattern_ids.map((id) => {
+        const originalId = originalIdsByBatchId.get(id);
 
-      if (!originalId) {
-        throw new Error(`Cluster references unknown batch pattern id: ${id}`);
-      }
+        if (!originalId) {
+          throw new Error(`Cluster references unknown batch pattern id: ${id}`);
+        }
 
-      return originalId;
-    }),
-  }));
+        return originalId;
+      }),
+    })),
+  };
 }
 
 function validateClusters(
@@ -666,8 +618,6 @@ function applyManualClusterOverrides(
 }
 
 async function main(): Promise<void> {
-  await loadLocalEnv();
-
   const projectRoot = process.cwd();
   const corpusPath = process.env.LENNY_CORPUS_PATH;
 
@@ -701,14 +651,8 @@ async function main(): Promise<void> {
     }
   }
 
-  const client = new OpenAI({
-    apiKey: getRequiredEnv("DEEPSEEK_API_KEY"),
-    baseURL: "https://api.deepseek.com/v1",
-  });
-  const clusters = applyManualClusterOverrides(
-    await clusterPatternBatch(client, patterns),
-    patterns,
-  );
+  const { clusters: rawClusters, costUsd } = await clusterPatternBatch(patterns);
+  const clusters = applyManualClusterOverrides(rawClusters, patterns);
   validateClusters(clusters, patterns);
   const patternsById = new Map(patterns.map((pattern) => [pattern.rawId, pattern]));
 
@@ -756,6 +700,7 @@ async function main(): Promise<void> {
   console.log(
     `Curated ${patterns.length} raw patterns into ${validated.length} final patterns.`,
   );
+  console.log(`Cost: $${costUsd.toFixed(4)}.`);
 }
 
 main().catch((error: unknown) => {

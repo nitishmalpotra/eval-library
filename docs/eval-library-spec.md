@@ -143,10 +143,10 @@ eval-library/
 │                                    # Corpus read via LENNY_CORPUS_PATH env var, not a symlink
 ├── scripts/
 │   ├── 01-select-files.ts           # Choose files to process (Tier 2 ranked by eval-signal density)
-│   ├── 02-extract-patterns.ts       # DeepSeek extraction pipeline
+│   ├── 02-extract-patterns.ts       # Extraction pipeline via OpenRouter
 │   ├── 03-curate.ts                 # Dedupe, merge, validate (conservative clustering)
-│   ├── 04-embed.ts                  # Embeddings via OpenAI text-embedding-3-small
-│   ├── 05-refine.ts                 # DeepSeek refinement pass (run before 04-embed)
+│   ├── 04-embed.ts                  # Embeddings via OpenRouter (`openai/text-embedding-3-small`)
+│   ├── 05-refine.ts                 # Refinement pass via OpenRouter (run before 04-embed)
 │   ├── 06-backfill.ts               # Fill empty when_not_to_use / common_pitfalls (idempotent)
 │   └── 07-deepen-explanations.ts    # Expand thin explanations (run before 04-embed)
 ├── src/
@@ -171,7 +171,7 @@ eval-library/
 │   │   │   └── page.tsx
 │   │   └── api/
 │   │       └── find/
-│   │           └── route.ts         # RAG endpoint (inlines OpenAI/DeepSeek clients + cosine)
+│   │           └── route.ts         # RAG endpoint (OpenRouter client + cosine)
 │   ├── components/
 │   │   ├── EvalCard.tsx
 │   │   ├── BrowseFilters.tsx
@@ -185,7 +185,8 @@ eval-library/
 │   │   ├── Providers.tsx
 │   │   └── ThemeToggle.tsx
 │   └── lib/
-│       └── evals.ts                 # Load + Zod-validate evals.json
+│       ├── evals.ts                 # Load + Zod-validate evals.json
+│       └── openrouter.ts            # Shared OpenRouter client (openai SDK)
 └── public/
     └── ...
 ```
@@ -196,15 +197,15 @@ eval-library/
 
 - **Framework:** Next.js 15 (App Router) + React 19 + TypeScript
 - **Styling:** Tailwind CSS v4 (clean utilitarian — Linear / Vercel aesthetic)
-- **LLM (extraction + RAG synthesis):** DeepSeek API (`deepseek-v4-pro` for pipeline extraction/curation/refinement, `deepseek-v4-flash` for live /find usage; OpenAI-compatible at `https://api.deepseek.com/v1`)
-- **Embeddings:** OpenAI `text-embedding-3-small` (cheapest production-grade; ~$0.02/1M tokens)
+- **LLM (extraction + /find judge):** OpenRouter (`anthropic/claude-sonnet-5.5` for extraction and quality passes, `anthropic/claude-opus-5.5` for clustering, `anthropic/claude-haiku-5.5` for live /find). Called with the OpenAI SDK at `https://openrouter.ai/api/v1`.
+- **Embeddings:** `openai/text-embedding-3-small` through the same OpenRouter client (~$0.02/1M tokens). Same model as the committed vectors, so they stay valid.
 - **Search:** In-memory cosine similarity over pre-computed vectors. No vector DB needed for ~60 patterns.
 - **Deployment:** Vercel (free tier)
 - **Open source:** MIT license, GitHub repo, attribution to Lenny in README and on /about
 
 ### Why this stack
-- DeepSeek is OpenAI-API-compatible → one client, two providers, easy swap.
-- OpenAI embeddings are dirt cheap and reliable; can be swapped to local model later.
+- One OpenAI-compatible client pointed at OpenRouter covers chat and embeddings.
+- `openai/text-embedding-3-small` stays the embedding model, so existing vectors do not need a rebuild.
 - In-memory search avoids hosting a vector DB for a tiny corpus.
 - Next.js + Vercel is one-command deploy and Codex's strongest territory.
 
@@ -214,15 +215,18 @@ eval-library/
 
 ```bash
 # .env.local
-DEEPSEEK_API_KEY=sk-...
-OPENAI_API_KEY=sk-...               # for embeddings only
-DEEPSEEK_MODEL_PIPELINE=deepseek-v4-pro
-DEEPSEEK_MODEL_RUNTIME=deepseek-v4-flash
-LENNY_CORPUS_PATH=/abs/path/to/lennys-newsletterpodcastdata-all   # used only by scripts/, not at runtime
+OPENROUTER_API_KEY=sk-or-...
+OPENROUTER_MODEL_TRIAGE=anthropic/claude-haiku-5.5
+OPENROUTER_MODEL_PIPELINE=anthropic/claude-sonnet-5.5
+OPENROUTER_MODEL_CLUSTER=anthropic/claude-opus-5.5
+OPENROUTER_MODEL_RUNTIME=anthropic/claude-haiku-5.5
+OPENROUTER_MODEL_EMBED=openai/text-embedding-3-small
+LENNY_CORPUS_PATH=/abs/path/to/lennys-newsletterpodcastdata-all   # current scripts only; not used at runtime
 NEXT_PUBLIC_SITE_URL=https://...
+NEXT_PUBLIC_REPO_URL=https://github.com/...
 ```
 
-The corpus path is needed only at extraction time. Once `data/evals.json` and `data/eval-embeddings.json` are committed to the repo, the running site needs **only** `DEEPSEEK_API_KEY` (for the /find RAG endpoint generation step) and `OPENAI_API_KEY` (for embedding the user's query).
+The corpus path is needed only when regenerating the library with the current scripts. Once `data/evals.json` and `data/eval-embeddings.json` are committed, the running site needs **only** `OPENROUTER_API_KEY` (query embeddings and the /find judge).
 
 ---
 
@@ -237,10 +241,10 @@ POST /api/find
 ```
 
 **Server logic:**
-1. Embed `query` with OpenAI `text-embedding-3-small`.
+1. Embed `query` with `openai/text-embedding-3-small` through OpenRouter.
 2. Compute cosine similarity vs. every vector in `data/eval-embeddings.json`.
 3. Take top 5 candidates.
-4. Send the candidates' summaries + the user's query to DeepSeek, which first gates the query — leniently, so a short-but-real feature like "a chatbot" passes; only unreadable gibberish, queries too vague to identify any feature, or clearly off-topic input are rejected — and then picks every genuinely relevant pattern (0–5, no padding to a fixed count) with a one-sentence rationale per pick.
+4. Send the candidates' summaries + the user's query to the runtime model on OpenRouter, which first gates the query — leniently, so a short-but-real feature like "a chatbot" passes; only unreadable gibberish, queries too vague to identify any feature, or clearly off-topic input are rejected — and then picks every genuinely relevant pattern (0–5, no padding to a fixed count) with a one-sentence rationale per pick. Reasoning is turned off for this call.
 5. Return one of two shapes.
 
 Accepted query:
@@ -269,7 +273,7 @@ The page renders the matches as eval cards (linking to `/eval/[id]`) with the ra
 
 ## 10. Extraction prompt — the key piece
 
-Codex will write a Node/TS script that loops over each file in the source set and sends it to DeepSeek with this extraction prompt (template — Codex should embed it in `scripts/02-extract-patterns.ts`):
+Codex will write a Node/TS script that loops over each file in the source set and sends it to the pipeline model with this extraction prompt (template — Codex should embed it in `scripts/02-extract-patterns.ts`):
 
 ```
 You are an expert AI Product Manager and technical writer. You are reading an interview transcript or newsletter from Lenny Rachitsky's publication. Your job is to extract every distinct AI EVALUATION PATTERN discussed in the text.
@@ -316,7 +320,7 @@ The script writes raw extraction output to `data/extracted/<file-id>.json`, then
 
 ### Refinement pass (`05-refine.ts`)
 
-After curation, an optional refinement pass (`npm run refine`) sends each pattern in `data/evals.json` back to DeepSeek to tighten three weak fields only: `one_liner` (forced under 120 chars), `codex_prompt_template` (must contain at least one `[PLACEHOLDER]`, or be emptied for purely conceptual patterns), and `feature_types` (narrowed to 1–3 specific types, avoiding `general`). All other fields are preserved, `curation_status` is set to `edited`, and the pre-refinement version is backed up to `data/evals.pre-refine.json`. Run this **before** `04-embed.ts` so embeddings reflect the refined text. `extract:all` does **not** include this step.
+After curation, an optional refinement pass (`npm run refine`) sends each pattern in `data/evals.json` back to the pipeline model to tighten three weak fields only: `one_liner` (forced under 120 chars), `codex_prompt_template` (must contain at least one `[PLACEHOLDER]`, or be emptied for purely conceptual patterns), and `feature_types` (narrowed to 1–3 specific types, avoiding `general`). All other fields are preserved, `curation_status` is set to `edited`, and the pre-refinement version is backed up to `data/evals.pre-refine.json`. Run this **before** `04-embed.ts` so embeddings reflect the refined text. `extract:all` does **not** include this step.
 
 ### Quality passes (`06-backfill.ts`, `07-deepen-explanations.ts`)
 
@@ -355,9 +359,9 @@ Page-level patterns:
 
 ### Phase 1 — Data extraction (Codex runs the scripts)
 - `scripts/01-select-files.ts` reads `index.json` + the corpus, outputs `data/files-to-process.json` containing Tier 1 (always) + Tier 2 (gated and ranked by eval-signal density)
-- `scripts/02-extract-patterns.ts` calls DeepSeek per file, writes raw `data/extracted/<id>.json`
+- `scripts/02-extract-patterns.ts` calls the pipeline model per file, writes raw `data/extracted/<id>.json`
 - `scripts/03-curate.ts` merges + dedupes + validates → `data/evals.json`
-- `scripts/04-embed.ts` calls OpenAI per pattern, writes `data/eval-embeddings.json`
+- `scripts/04-embed.ts` calls OpenRouter per pattern, writes `data/eval-embeddings.json`
 - Output: at least 25 distinct, well-formed patterns
 
 ### Phase 2 — Static site

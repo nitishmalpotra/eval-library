@@ -45,3 +45,4 @@ data/extracted/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/corpus/

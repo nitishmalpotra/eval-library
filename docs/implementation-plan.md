@@ -2,7 +2,7 @@
 
 **Written:** 2026-10-23 · **For:** an AI implementer (Codex / Claude Code / Cursor) · **Owner:** Nitish Malpotra
 
-Read this whole file before starting. It records decisions the owner has **already made**, so don't reopen them. Where this plan says "verify", check the live docs or code before acting. **Per `AGENTS.md`, this Next.js version may differ from your training data, so read the relevant guide in `node_modules/next/dist/docs/` before writing any Next.js code.**
+Read this whole file before starting. It records decisions the owner has **already made**, so don't reopen them. Where this plan says "verify", check the live docs or code before acting. **Per `AGENTS.md`, this Next.js version may differ from your training data, so read the relevant guide in `node_modules/next/dist/docs/` before writing any Next.js code.** The installed version is Next 15.5.18 and that docs folder doesn't exist in it. Use https://nextjs.org/docs (v15) instead, and don't assume Next 16 APIs.
 
 ---
 
@@ -72,7 +72,7 @@ Other issues:
 - Branding copy says "Lenny" in `layout.tsx`, `page.tsx`, `about/page.tsx`, and `opengraph-image.tsx`.
 
 ### 1.5 Corpus inventory
-- **Old Lenny archive**: not on this machine. The owner has it elsewhere. It has `index.json` plus `podcasts/*.md` (298) and `newsletters/*.md` (354), with YAML frontmatter (`title`, `date`, `guest`, `url`/`post_url`/`youtube_url`). It's about 5.65M words. `docs/corpus_topic_map_rebuilt.csv` describes it (latest date 2026-04-26).
+- **Old Lenny archive**: now in `corpus/lenny/` (newer copy, dated up to 2026-06-21). It has `index.json` plus `podcasts/*.md` (305) and `newsletters/*.md` (361), with YAML frontmatter (`title`, `date`, `guest`, `url`/`post_url`/`youtube_url`). It's about 5.65M words. `docs/corpus_topic_map_rebuilt.csv` describes it (latest date 2026-04-26).
 - **New files** (currently in `../evals/`, outside the repo), 33 `.md` files, about 0.73M words:
   - `Lenny/`: 30 YouTube podcast transcripts. **None of them overlap with the old archive by title.** Only about 4 have meaningful eval content (Dianne Penn has 46 "eval" mentions; most have 0).
   - `Aakash/`: 1 transcript, "How to Build AI Evals in 2026" (92 mentions).
@@ -235,11 +235,11 @@ type CorpusDoc = {
   };
   ```
   Unknown folders fall back to the folder name as the publication and `kind: "video"`, with a console warning.
-- **Folders that contain `index.json`** (the old Lenny archive): use the index for `title`, `date`, and `guest`. `podcasts/` maps to `kind: podcast` with the guest as operator. `newsletters/` maps to `kind: newsletter` with the operator set to "Lenny Rachitsky" unless the frontmatter has an `author`. The URL comes from frontmatter `url` / `post_url` / `youtube_url`, as `03-curate.ts` does today.
+- **Folders that contain `index.json`** (the old Lenny archive): use the index for `title`, `date`, and `guest`. **Verified 2026-10-23:** index `filename`s carry numeric folder prefixes (`03-podcasts/x.md`, `02-newsletters/x.md`), but the folders on disk are `podcasts/` and `newsletters/`. Strip a leading `^\d+-` from the first path segment when resolving. All 666 entries (305 podcasts, 361 newsletters) resolve once it's stripped. The newer archive puts `post_url` (lennysnewsletter.com) in the index, and podcast frontmatter may also carry `youtube_url`. `podcasts/` maps to `kind: podcast` with the guest as operator. `newsletters/` maps to `kind: newsletter` with the operator set to "Lenny Rachitsky" unless the frontmatter has an `author`. The URL comes from frontmatter `url` / `post_url` / `youtube_url`, as `03-curate.ts` does today.
 - **All other `.md` files:** parse frontmatter with `gray-matter` (already a dependency). Fall back to `# Title` on line 1 and `**Source:** <url>` for the URL.
   - Operator heuristic: take the text after the last `|` in the title and strip the parenthetical company, e.g. "Dianne Penn (Anthropic)" becomes "Dianne Penn". Triage (§6.2) may overwrite it.
   - Strip the title, Source line, and `## Transcript` header from `body`.
-- **Dedupe:** use the normalized URL, falling back to the normalized title. If two files collide, keep the one with frontmatter and log the duplicate.
+- **Dedupe:** match on **any** of: the normalized URL (compare every URL a file has: `post_url`, `youtube_url`, `url`, `**Source:**`); or the normalized title text **before the first `|`**, together with the same operator. If two files collide, keep the one with frontmatter (the archive copy) and log the duplicate. Known case: `lenny-transcripts/The_hidden_pattern_behind_successful_products_Mark_transcript.md` duplicates `lenny/podcasts/mark-pincus.md`. Their URLs differ (YouTube vs. newsletter), and their titles differ after the `|`, so URL-only or full-title dedupe misses it.
 - **Self-check:** add `scripts/lib/corpus.test.ts` using `node:test` + `node:assert`. Cover parsing one fixture string in each format (frontmatter / header-only / index-backed) and the operator-from-title heuristic. Run it with `npx tsx --test scripts/lib/corpus.test.ts`.
 
 ### 6.2 `scripts/01-triage.ts` (replaces `01-select-files.ts`)

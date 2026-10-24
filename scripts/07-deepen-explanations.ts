@@ -1,7 +1,8 @@
 import { copyFile, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
+import { models } from "../src/lib/openrouter";
+import { chatJson } from "./lib/llm";
 
 type DeepenStats = {
   inputTokens: number;
@@ -14,8 +15,7 @@ type DeepenStats = {
 // grounded paragraphs. NOTE: explanation is part of the embedding text, so run
 // `npm run extract:embed` after this to keep vectors in sync.
 const lengthThreshold = 300;
-const concurrency = 5;
-const retryDelayMs = 5_000;
+const concurrency = 2;
 
 const evalPatternSchema = z
   .object({
@@ -51,51 +51,24 @@ metric_or_method: ${pattern.metric_or_method}
 source_excerpt (verbatim, your ground truth): ${pattern.source_excerpt}`;
 }
 
-function parseResponse(content: string | null): string {
-  if (!content) {
-    throw new Error("The model returned an empty response.");
-  }
-
-  return responseSchema.parse(JSON.parse(content)).explanation;
-}
-
-async function delay(ms: number): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
-  try {
-    return await fn();
-  } catch {
-    await delay(retryDelayMs);
-    return fn();
-  }
-}
-
 async function deepenPattern(
   pattern: EvalPattern,
 ): Promise<{ explanation: string; stats: DeepenStats }> {
-  return withRetry(async () => {
-    const response = await getOpenRouter().chat.completions.create(
-      {
-        model: models.pipeline,
-        messages: [{ role: "user", content: buildPrompt(pattern) }],
-        response_format: { type: "json_object" },
-        // Reasoning can consume a small cap and leave empty content.
-        max_tokens: 32_000,
-      },
-      { timeout: pipelineTimeoutMs },
-    );
-
-    return {
-      explanation: parseResponse(response.choices[0]?.message.content ?? null),
-      stats: {
-        inputTokens: response.usage?.prompt_tokens ?? 0,
-        outputTokens: response.usage?.completion_tokens ?? 0,
-        costUsd: usageCostUsd(response.usage),
-      },
-    };
+  const result = await chatJson(responseSchema, {
+    model: models.pipeline,
+    name: "explanation",
+    max_tokens: 32_000,
+    messages: [{ role: "user", content: buildPrompt(pattern) }],
   });
+
+  return {
+    explanation: result.data.explanation,
+    stats: {
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+      costUsd: result.costUsd,
+    },
+  };
 }
 
 async function runBatch<T>(

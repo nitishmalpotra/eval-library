@@ -21,6 +21,7 @@ const sourceSchema = z.object({
   title: z.string(),
   date: z.string(),
   operator: z.string(),
+  publication: z.string().default(""),
   url: z.string().url().optional(),
   excerpt: z.string(),
 });
@@ -39,6 +40,7 @@ const evalPatternSchema = z.object({
   metric_or_method: z.string(),
   common_pitfalls: z.array(z.string()),
   source_operator: z.string(),
+  source_publication: z.string().default(""),
   source_file: z.string(),
   source_title: z.string(),
   source_date: z.string(),

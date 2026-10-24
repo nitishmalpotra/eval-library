@@ -2,9 +2,9 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
 import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
+import { assertBudget, recordSpend } from "./lib/llm";
 
 const batchSize = 100;
-const dimension = 1_536;
 
 const evalPatternSchema = z.object({
   id: z.string(),
@@ -52,8 +52,10 @@ async function main(): Promise<void> {
   const vectors: Array<{ id: string; vector: number[] }> = [];
   let totalTokens = 0;
   let costUsd = 0;
+  let dimension = 0;
 
   for (const batch of chunk(patterns, batchSize)) {
+    await assertBudget();
     const response = await getOpenRouter().embeddings.create(
       {
         model: models.embed,
@@ -62,8 +64,10 @@ async function main(): Promise<void> {
       { timeout: pipelineTimeoutMs },
     );
 
+    const batchCost = usageCostUsd(response.usage);
     totalTokens += response.usage.total_tokens;
-    costUsd += usageCostUsd(response.usage);
+    costUsd += batchCost;
+    await recordSpend(batchCost);
 
     if (response.data.length !== batch.length) {
       throw new Error(
@@ -72,6 +76,10 @@ async function main(): Promise<void> {
     }
 
     for (const [index, embedding] of response.data.entries()) {
+      if (dimension === 0) {
+        dimension = embedding.embedding.length;
+      }
+
       if (embedding.embedding.length !== dimension) {
         throw new Error(
           `Unexpected vector length for ${batch[index].id}: ${embedding.embedding.length}.`,

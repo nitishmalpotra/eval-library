@@ -1,216 +1,986 @@
 {
-  "generated_at": "2026-05-30T21:24:03.307Z",
-  "tier1": [
+  "generated_at": "2026-10-24T04:00:09.739Z",
+  "files": [
     {
-      "file": "newsletters/building-eval-systems-that-improve-your-ai-product.md",
-      "title": "Building eval systems that improve your AI product",
-      "date": "2025-09-09",
-      "guest": "",
-      "word_count": 4662
+      "file": "aakash/How_to_Build_AI_Evals_in_2026_Step-by-Step_No_Hype_transcript.md",
+      "publication": "Aakash Gupta",
+      "kind": "podcast",
+      "title": "How to Build AI Evals in 2026 (Step-by-Step, No Hype)",
+      "operator": "Aakash Gupta, HL Hussein, Shreya Shankar",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=J7N9FMouSKg",
+      "eval_relevance": 3
     },
     {
-      "file": "newsletters/beyond-vibe-checks-a-pms-complete-guide-to-evals.md",
-      "title": "Beyond vibe checks: A PM’s complete guide to evals",
-      "date": "2025-04-08",
-      "guest": "",
-      "word_count": 3558
+      "file": "ai-engineer/Build_Evals_That_Actually_Matter_-_Nick_Ung_Akshay_transcript.md",
+      "publication": "AI Engineer",
+      "kind": "talk",
+      "title": "Build Evals That Actually Matter - Nick Ung & Akshay Sharma, Lyft",
+      "operator": "Nick, Akshay Sharma",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=3z2uT5aDx_Y",
+      "eval_relevance": 3
     },
     {
-      "file": "newsletters/why-your-ai-product-needs-a-different-development-lifecycle.md",
-      "title": "Why your AI product needs a different development lifecycle",
-      "date": "2025-08-19",
-      "guest": "",
-      "word_count": 4693
+      "file": "ai-engineer/Evals_in_AI_A_Deep_Dive_Tejas_Kumar_IBM_transcript.md",
+      "publication": "AI Engineer",
+      "kind": "talk",
+      "title": "Evals in AI: A Deep Dive — Tejas Kumar, IBM",
+      "operator": "Tejas Kumar",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=NdrSPm6NCdk",
+      "eval_relevance": 3
     },
     {
-      "file": "podcasts/hamel-husain--shreya-shankar.md",
-      "title": "Why AI evals are the hottest new skill for product builders | Hamel Husain & Shreya Shankar (creators of the #1 eval course)",
-      "date": "2025-09-25",
-      "guest": "Hamel Husain & Shreya Shankar",
-      "word_count": 19671
+      "file": "lenny/newsletters/25-proven-tactics-to-accelerate-ai-adoption-at-your-company.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "25 proven tactics to accelerate AI adoption at your company",
+      "operator": "Lenny Rachitsky",
+      "date": "2025-08-05",
+      "url": "https://www.lennysnewsletter.com/p/25-proven-tactics-to-accelerate-ai-adoption-at-your-company",
+      "eval_relevance": 2
     },
     {
-      "file": "podcasts/brendan-foody.md",
-      "title": "Why experts writing AI evals is creating the fastest-growing companies in history | Brendan Foody (CEO of Mercor)",
-      "date": "2025-09-18",
-      "guest": "Brendan Foody",
-      "word_count": 12143
-    },
-    {
-      "file": "newsletters/counterintuitive-advice-for-building-ai-products.md",
-      "title": "Counterintuitive advice for building AI products",
-      "date": "2024-07-02",
-      "guest": "",
-      "word_count": 3501
-    },
-    {
-      "file": "newsletters/an-ai-glossary.md",
+      "file": "lenny/newsletters/an-ai-glossary.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
       "title": "An AI glossary",
+      "operator": "Lenny Rachitsky",
       "date": "2025-06-24",
-      "guest": "",
-      "word_count": 3280
+      "url": "https://www.lennysnewsletter.com/p/an-ai-glossary",
+      "eval_relevance": 2
     },
     {
-      "file": "newsletters/how-close-is-ai-to-replacing-product-managers.md",
-      "title": "How close is AI to replacing product managers?",
-      "date": "2024-07-09",
-      "guest": "",
-      "word_count": 7120
-    }
-  ],
-  "tier2": [
-    {
-      "file": "podcasts/aishwarya-naresh-reganti--kiriti-badam.md",
-      "title": "Aishwarya Naresh Reganti + Kiriti Badam",
-      "date": "2026-01-11",
-      "guest": "Aishwarya Naresh Reganti + Kiriti Badam",
-      "word_count": 16521,
-      "eval_mention_count": 41,
-      "eval_score": 41
+      "file": "lenny/newsletters/beyond-vibe-checks-a-pms-complete-guide-to-evals.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "Beyond vibe checks: A PM’s complete guide to evals",
+      "operator": "Aman Khan, Lenny Rachitsky",
+      "date": "2025-04-08",
+      "url": "https://www.lennysnewsletter.com/p/beyond-vibe-checks-a-pms-complete-guide-to-evals",
+      "eval_relevance": 3
     },
     {
-      "file": "podcasts/chip-huyen.md",
-      "title": "Al Engineering 101 with Chip Huyen (Nvidia, Stanford, Netflix)",
-      "date": "2025-10-23",
-      "guest": "Chip Huyen",
-      "word_count": 15252,
-      "eval_mention_count": 41,
-      "eval_score": 41
+      "file": "lenny/newsletters/building-ai-product-sense-part-2.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "Building AI product sense, part 2",
+      "operator": "Dr. Marily Nika",
+      "date": "2026-02-10",
+      "url": "https://www.lennysnewsletter.com/p/building-ai-product-sense-part-2",
+      "eval_relevance": 2
     },
     {
-      "file": "podcasts/kevin-weil.md",
-      "title": "OpenAI’s CPO on how AI changes must-have skills, moats, coding, startup playbooks, more | Kevin Weil (CPO at OpenAI, ex-Instagram, Twitter)",
-      "date": "2025-04-10",
-      "guest": "Kevin Weil",
-      "word_count": 17450,
-      "eval_mention_count": 23,
-      "eval_score": 23
+      "file": "lenny/newsletters/building-eval-systems-that-improve-your-ai-product.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "Building eval systems that improve your AI product",
+      "operator": "Hamel Husain, Shreya Shankar",
+      "date": "2025-09-09",
+      "url": "https://www.lennysnewsletter.com/p/building-eval-systems-that-improve-your-ai-product",
+      "eval_relevance": 3
     },
     {
-      "file": "podcasts/karina-nguyen.md",
-      "title": "OpenAI researcher on why soft skills are the future of work | Karina Nguyen (Research at OpenAI, ex-Anthropic)",
-      "date": "2025-02-09",
-      "guest": "Karina Nguyen",
-      "word_count": 12135,
-      "eval_mention_count": 22,
-      "eval_score": 22
+      "file": "lenny/newsletters/chatgpt-apps-are-about-to-be-the-next-big-distribution-channel-heres-how-to-build-one.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "ChatGPT apps are about to be the next big distribution channel: Here’s how to build one",
+      "operator": "Lenny Rachitsky",
+      "date": "2026-01-20",
+      "url": "https://www.lennysnewsletter.com/p/chatgpt-apps-are-about-to-be-the",
+      "eval_relevance": 1
     },
     {
-      "file": "podcasts/jason-droege.md",
-      "title": "First interview with Scale AI’s CEO: $14B Meta deal, what’s working in enterprise AI, and what frontier labs are building next | Jason Droege",
-      "date": "2025-10-09",
-      "guest": "Jason Droege",
-      "word_count": 16442,
-      "eval_mention_count": 12,
-      "eval_score": 12
+      "file": "lenny/newsletters/counterintuitive-advice-for-building-ai-products.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "Counterintuitive advice for building AI products",
+      "operator": "Hilary Gridley, Ryan J. Salva",
+      "date": "2024-07-02",
+      "url": "https://www.lennysnewsletter.com/p/counterintuitive-advice-for-building-ai-products",
+      "eval_relevance": 1
     },
     {
-      "file": "podcasts/cat-wu.md",
-      "title": "How Anthropic’s product team moves faster than anyone else | Cat Wu (Head of Product, Claude Code)",
-      "date": "2026-04-23",
-      "guest": "Cat Wu",
-      "word_count": 16271,
-      "eval_mention_count": 12,
-      "eval_score": 12
-    },
-    {
-      "file": "podcasts/edwin-chen.md",
-      "title": "The 100-person AI lab that became Anthropic and Google's secret weapon | Edwin Chen (Surge AI)",
-      "date": "2025-12-07",
-      "guest": "Edwin Chen",
-      "word_count": 14500,
-      "eval_mention_count": 9,
-      "eval_score": 9
-    },
-    {
-      "file": "podcasts/howie-liu.md",
-      "title": "How we restructured Airtable’s entire org for AI | Howie Liu (co-founder and CEO)",
-      "date": "2025-08-31",
-      "guest": "Howie Liu",
-      "word_count": 18139,
-      "eval_mention_count": 8,
-      "eval_score": 8
-    },
-    {
-      "file": "podcasts/nick-turley.md",
-      "title": "Inside ChatGPT: The fastest-growing product in history | Nick Turley (Head of ChatGPT at OpenAI)",
-      "date": "2025-08-09",
-      "guest": "Nick Turley",
-      "word_count": 19233,
-      "eval_mention_count": 6,
-      "eval_score": 6
-    },
-    {
-      "file": "podcasts/boris-cherny.md",
-      "title": "Boris Cherny",
-      "date": "2026-02-19",
-      "guest": "Boris Cherny",
-      "word_count": 19629,
-      "eval_mention_count": 4,
-      "eval_score": 4
-    },
-    {
-      "file": "newsletters/five-proven-prompt-engineering-techniques-and-a-few-more-advanced-tactics.md",
+      "file": "lenny/newsletters/five-proven-prompt-engineering-techniques-and-a-few-more-advanced-tactics.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
       "title": "Five proven prompt engineering techniques (and a few more-advanced tactics)",
+      "operator": "Mike Taylor",
       "date": "2024-10-29",
-      "guest": "",
-      "word_count": 3428,
-      "eval_mention_count": 0,
-      "eval_score": 4
+      "url": "https://www.lennysnewsletter.com/p/five-proven-prompt-engineering-techniques-and-a-few-more-advanced-tactics",
+      "eval_relevance": 2
     },
     {
-      "file": "podcasts/sherwin-wu-v2.md",
-      "title": "Sherwin Wu V2",
-      "date": "2026-02-12",
-      "guest": "Sherwin Wu V2",
-      "word_count": 15820,
-      "eval_mention_count": 3,
-      "eval_score": 3
+      "file": "lenny/newsletters/how-close-is-ai-to-replacing-product-managers.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "How close is AI to replacing product managers?",
+      "operator": "Lenny Rachitsky, Mike Taylor",
+      "date": "2024-07-09",
+      "url": "https://www.lennysnewsletter.com/p/how-close-is-ai-to-replacing-product-managers",
+      "eval_relevance": 3
     },
     {
-      "file": "podcasts/garrett-lord.md",
-      "title": "Inside the expert network training every frontier AI model | Garrett Lord (Handshake CEO)",
-      "date": "2025-08-24",
-      "guest": "Garrett Lord",
-      "word_count": 12775,
-      "eval_mention_count": 3,
-      "eval_score": 3
+      "file": "lenny/newsletters/how-i-built-lennyrpg.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "How I built LennyRPG",
+      "operator": "Lenny Rachitsky",
+      "date": "2026-03-17",
+      "url": "https://www.lennysnewsletter.com/p/how-i-built-lennyrpg",
+      "eval_relevance": 1
     },
     {
-      "file": "podcasts/asha-sharma.md",
-      "title": "How 80,000 companies build with AI: products as organisms, the death of org charts, and why agents will outnumber employees by 2026 | Asha Sharma (CVP of AI Platform at Microsoft)",
-      "date": "2025-08-28",
-      "guest": "Asha Sharma",
-      "word_count": 10939,
-      "eval_mention_count": 3,
-      "eval_score": 3
+      "file": "lenny/newsletters/how-to-build-ai-product-sense.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "How to build AI product sense",
+      "operator": "Lenny Rachitsky",
+      "date": "2026-02-03",
+      "url": "https://www.lennysnewsletter.com/p/how-to-build-ai-product-sense",
+      "eval_relevance": 1
     },
     {
-      "file": "podcasts/robby-stein.md",
-      "title": "Inside Google's AI turnaround: The rise of AI Mode, strategy behind AI Overviews, and their vision for AI-powered search | Robby Stein (VP of Product, Google Search)",
-      "date": "2025-10-10",
-      "guest": "Robby Stein",
-      "word_count": 17711,
-      "eval_mention_count": 2,
-      "eval_score": 2
+      "file": "lenny/newsletters/how-to-do-ai-analysis-you-can-actually-trust.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "How to do AI analysis you can actually trust",
+      "operator": "Caitlin Sullivan",
+      "date": "2026-02-17",
+      "url": "https://www.lennysnewsletter.com/p/how-to-do-ai-analysis-you-can-actually",
+      "eval_relevance": 2
     },
     {
-      "file": "podcasts/alexander-embiricos.md",
+      "file": "lenny/newsletters/how-to-get-your-entire-team-prototyping-with-ai.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "How to get your entire team prototyping with AI",
+      "operator": "Lenny Rachitsky",
+      "date": "2025-06-10",
+      "url": "https://www.lennysnewsletter.com/p/how-to-get-your-entire-team-prototyping-with-ai",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/newsletters/how-to-use-ai-for-your-next-job-interview.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "How to use AI for your next job interview",
+      "operator": "Lenny Rachitsky",
+      "date": "2026-02-24",
+      "url": "https://www.lennysnewsletter.com/p/how-to-use-ai-in-your-next-job-interview",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/newsletters/i-built-a-lenny-chatbot-using-gpt-3-heres-how-to-build-your-own.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "I built a Lenny chatbot using GPT-3. Here’s how to build your own.",
+      "operator": "Dan Shipper",
+      "date": "2023-02-07",
+      "url": "https://www.lennysnewsletter.com/p/i-built-a-lenny-chatbot-using-gpt-3-heres-how-to-build-your-own",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/newsletters/make-product-management-fun-again-with-ai-agents.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "Make product management fun again with AI agents",
+      "operator": "Lenny Rachitsky",
+      "date": "2025-04-29",
+      "url": "https://www.lennysnewsletter.com/p/make-product-management-fun-again-with-ai-agents",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/newsletters/why-your-ai-product-needs-a-different-development-lifecycle.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "Why your AI product needs a different development lifecycle",
+      "operator": "Aishwarya Reganti, Kiriti Badam",
+      "date": "2025-08-19",
+      "url": "https://www.lennysnewsletter.com/p/why-your-ai-product-needs-a-different-development-lifecycle",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/newsletters/you-should-be-playing-with-gpts-at-work.md",
+      "publication": "Lenny's Newsletter",
+      "kind": "newsletter",
+      "title": "You should be playing with GPTs at work",
+      "operator": "Minh Pham",
+      "date": "2024-02-20",
+      "url": "https://www.lennysnewsletter.com/p/you-should-be-playing-with-gpts-at-work",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/AIs_third_era_the_rise_of_persistent_AI_coworkers__transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "AI’s third era: the rise of persistent AI coworkers | Tara Seshan (OpenAI’s product lead)",
+      "operator": "Tara Seshan",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=zMvBMfj4cSQ",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/Chatbots_are_not_the_final_interface_OpenAIs_Head__transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Chatbots are not the final interface: OpenAI’s Head of Design on what’s next | Ian Silber",
+      "operator": "Ian Silber",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=BV0hy6NET-U",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/Context_is_now_the_product_Product_leadership_when_transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Context is now the product: Product leadership when software can build itself | Karri Saarinen",
+      "operator": "Karri Saarinen",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=Zn9NZ-r1-C4",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/Everyones_shipping_more_Does_any_of_it_matter_Clai_transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Everyone’s shipping more. Does any of it matter? | Claire Vo",
+      "operator": "Claire Vo",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=VM5kuvWgwDY",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/How_to_scale_intent_quality_and_artistry_with_Al_K_transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "How to scale intent, quality, and artistry with Al | Katie Dill (Stripe)",
+      "operator": "Katie Dill",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=GLvFTMtw4Jk",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/How_we_built_Grok_Bot_in_a_month_Roman_Ugarte_Spac_transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "How we built Grok Bot in a month | Roman Ugarte (SpaceXAI)",
+      "operator": "Roman Ugarte",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=maSdsTLaMuU",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/Inside_the_black_box_of_AI_How_AI_models_actually__transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Inside the black box of AI: How AI models actually think | Emmanuel Ameisen (Anthropic)",
+      "operator": "Emmanuel Ameisen",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=JHo-aiePjoM",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/Roles_arent_convergingtheyre_expanding_Tamar_Yehos_transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Roles aren't converging—they're expanding | Tamar Yehoshua (Atlassian CPO)",
+      "operator": "Tamar Yehoshua",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=BtK4kFI1LNo",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/Stop_planning_for_2027_how_OpenAI_builds_product_9_transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Stop planning for 2027: how OpenAI builds product 90 days at a time | Tara Sesha and Nan Yu (OpenAI)",
+      "operator": "Tara Sesha, Nan Yu",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=-ciSTkEVy30",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/What_happens_after_coding_is_solved_Fiona_Fung_Cla_transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "What happens after coding is solved? | Fiona Fung (Claude Code & Cowork)",
+      "operator": "Fiona Fung",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=Ybrl4FYM57c",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/What_it_takes_to_be_a_top_PM_today_Robby_Stein_Goo_transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "What it takes to be a top PM today | Robby Stein (Google Search)",
+      "operator": "Robby Stein",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=sTgM_sbLMNg",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny-transcripts/Why_AI_is_going_vertical_again_Dianne_Penn_Anthrop_transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Why AI is going vertical (again) | Dianne Penn (Anthropic)",
+      "operator": "Dianne Penn",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=tivaWTTVRhY",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny-transcripts/Why_Claude_cant_be_your_PM_yet_Anthropic_CPO_Panel_transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Why Claude can’t be your PM (yet) | Anthropic CPO Panel",
+      "operator": "Mike, Amy",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=sEXdyK6woKU",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny-transcripts/Why_companies_are_becoming_a_series_of_loops_Anish_transcript.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Why companies are becoming a series of loops | Anish Acharya (a16z)",
+      "operator": "Anish Acharya",
+      "date": "",
+      "url": "https://www.youtube.com/watch?v=LdIyXiq2DTY",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/aishwarya-naresh-reganti--kiriti-badam.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Aishwarya Naresh Reganti + Kiriti Badam",
+      "operator": "Aishwarya Naresh Reganti, Kiriti Badam",
+      "date": "2026-01-11",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/alexander-embiricos.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
       "title": "The power user’s guide to Codex: parallelizing workflows, planning techniques, advanced context engineering tips, automating code reviews, and more | Alexander Embiricos",
+      "operator": "Alexander Embiricos",
       "date": "2026-01-12",
-      "guest": "Alexander Embiricos",
-      "word_count": 17504,
-      "eval_mention_count": 2,
-      "eval_score": 2
+      "url": "https://www.youtube.com/watch?v=xeZDHGjG5zM",
+      "eval_relevance": 1
     },
     {
-      "file": "newsletters/how-to-get-the-most-out-of-your-product-pass-part-1.md",
-      "title": "How to get the most out of your product pass, part 1",
-      "date": "2025-09-23",
-      "guest": "",
-      "word_count": 2321,
-      "eval_mention_count": 2,
-      "eval_score": 2
+      "file": "lenny/podcasts/amjad-masad.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Behind the product: Replit | Amjad Masad (co-founder and CEO)",
+      "operator": "Amjad Masad",
+      "date": "2024-11-21",
+      "url": "https://www.youtube.com/watch?v=Bp_h674oIhw",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/amol-avasare.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Anthropic’s $1B to $19B growth run: how Claude became the fastest-growing AI product in history | Amol Avasare",
+      "operator": "Amol Avasare",
+      "date": "2026-04-05",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/annie-duke.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "This will make you a better decision-maker | Annie Duke (author of “Thinking in Bets” and “Quit,” former pro poker player)",
+      "operator": "Annie Duke",
+      "date": "2024-05-02",
+      "url": "https://www.youtube.com/watch?v=svQMODvIGAE",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/anton-osika.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Building Lovable: $10M ARR in 60 days with 15 people | Anton Osika (co-founder and CEO)",
+      "operator": "Anton Osika",
+      "date": "2025-03-09",
+      "url": "https://www.youtube.com/watch?v=DZtGxNs9AVg",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/aparna-chennapragada.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Microsoft CPO: If you aren’t prototyping with AI, you’re doing it wrong | Aparna Chennapragada",
+      "operator": "Aparna Chennapragada",
+      "date": "2025-05-18",
+      "url": "https://www.youtube.com/watch?v=HbbfXAWcuUo",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/asha-sharma.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "How 80,000 companies build with AI: products as organisms, the death of org charts, and why agents will outnumber employees by 2026 | Asha Sharma (CVP of AI Platform at Microsoft)",
+      "operator": "Asha Sharma",
+      "date": "2025-08-28",
+      "url": "https://www.youtube.com/watch?v=J9UWaltU-7Q",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/benjamin-mann.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Benjamin Mann",
+      "operator": "Benjamin Mann",
+      "date": "2025-07-20",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/boris-cherny.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Boris Cherny",
+      "operator": "Boris Cherny",
+      "date": "2026-02-19",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/brendan-foody.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Why experts writing AI evals is creating the fastest-growing companies in history | Brendan Foody (CEO of Mercor)",
+      "operator": "Brendan Foody",
+      "date": "2025-09-18",
+      "url": "https://www.youtube.com/watch?v=ja6fWTDPQl4",
+      "eval_relevance": 3
+    },
+    {
+      "file": "lenny/podcasts/bret-taylor.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "He saved OpenAI, invented the “Like” button, and built Google Maps: Bret Taylor on the future of careers, coding, agents, and more",
+      "operator": "Bret Taylor",
+      "date": "2025-07-31",
+      "url": "https://www.youtube.com/watch?v=qImgGtnNbx0",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/caitlin-kalinowski.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Why we’re at the beginning of the AI hardware boom | Caitlin Kalinowski (ex–OpenAI, Meta, Apple)",
+      "operator": "Caitlin Kalinowski",
+      "date": "2026-05-17",
+      "url": "https://www.lennysnewsletter.com/p/why-were-at-the-beginning-of-the",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/camille-fournier.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The things engineers are desperate for PMs to understand | Camille Fournier (author of “The Manager’s Path,” ex-CTO at Rent the Runway)",
+      "operator": "Camille Fournier",
+      "date": "2024-09-15",
+      "url": "https://www.youtube.com/watch?v=hZSh0rs20uI",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/cat-wu.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "How Anthropic’s product team moves faster than anyone else | Cat Wu (Head of Product, Claude Code)",
+      "operator": "Cat Wu",
+      "date": "2026-04-23",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/chip-huyen.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Al Engineering 101 with Chip Huyen (Nvidia, Stanford, Netflix)",
+      "operator": "Chip Huyen",
+      "date": "2025-10-23",
+      "url": "https://www.youtube.com/watch?v=qbvY0dQgSJ4",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/dan-shipper-2.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The AI paradox: More automation, more humans, more work | Dan Shipper",
+      "operator": "Dan Shipper",
+      "date": "2026-05-24",
+      "url": "https://www.lennysnewsletter.com/p/the-ai-paradox-dan-shipper",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/dan-shipper.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The AI-native startup: 5 products, 7-figure revenue, 100% AI-written code | Dan Shipper (co-founder/CEO of Every)",
+      "operator": "Dan Shipper",
+      "date": "2025-07-17",
+      "url": "https://www.youtube.com/watch?v=crMrVozp_h8",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/david-singleton.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Building a culture of excellence | David Singleton (CTO of Stripe)",
+      "operator": "David Singleton",
+      "date": "2023-05-04",
+      "url": "https://www.youtube.com/watch?v=F0_IKKY3HCk",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/dhanji-r-prasanna.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "How Block is becoming the most AI-native enterprise in the world | Dhanji R. Prasanna",
+      "operator": "Dhanji R. Prasanna",
+      "date": "2025-10-26",
+      "url": "https://www.youtube.com/watch?v=JMeXWVw0r3E",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/edwin-chen.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The 100-person AI lab that became Anthropic and Google's secret weapon | Edwin Chen (Surge AI)",
+      "operator": "Edwin Chen",
+      "date": "2025-12-07",
+      "url": "https://www.youtube.com/watch?v=dduQeaqmpnI",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/eric-ries.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Reflections on a movement | Eric Ries (creator of the Lean Startup methodology)",
+      "operator": "Eric Ries",
+      "date": "2023-10-29",
+      "url": "https://www.youtube.com/watch?v=xzebbzIntFc",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/eric-simons.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Inside Bolt: From near-death to ~$40m ARR in 5 months—one of the fastest-growing products in history | Eric Simons (founder and CEO of StackBlitz)",
+      "operator": "Eric Simons",
+      "date": "2025-03-13",
+      "url": "https://www.youtube.com/watch?v=L22DtAHLmzs",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/ethan-smith.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The ultimate guide to AEO: How to get ChatGPT to recommend your product | Ethan Smith (Graphite)",
+      "operator": "Ethan Smith",
+      "date": "2025-09-14",
+      "url": "https://www.youtube.com/watch?v=iT7kq-R3Gjc",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/fiona-fung.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Building the most AI-pilled engineering team in the world | Fiona Fung (Manager of the Claude Code and Cowork Teams)",
+      "operator": "Fiona Fung",
+      "date": "2026-06-21",
+      "url": "https://www.lennysnewsletter.com/p/building-the-most-ai-pilled-engineering",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/garrett-lord.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Inside the expert network training every frontier AI model | Garrett Lord (Handshake CEO)",
+      "operator": "Garrett Lord",
+      "date": "2025-08-24",
+      "url": "https://www.youtube.com/watch?v=0qdR-XwHJ9o",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/grant-lee.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "“Dumbest idea I’ve heard” to $100M ARR: Inside the rise of Gamma | Grant Lee (CEO)",
+      "operator": "Grant Lee",
+      "date": "2025-11-13",
+      "url": "https://www.youtube.com/watch?v=3H0ngGU5pbM",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/guillermo-rauch.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Everyone’s an engineer now: Inside v0’s mission to create a hundred million builders | Guillermo Rauch (founder and CEO of Vercel, creators of v0 and Next.js)",
+      "operator": "Guillermo Rauch",
+      "date": "2025-04-13",
+      "url": "https://www.youtube.com/watch?v=-QsTmu2CqhA",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/gustav-soderstrom.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Gustav Söderström",
+      "operator": "Gustav Söderström",
+      "date": "2023-05-21",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/hamel-husain--shreya-shankar.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Why AI evals are the hottest new skill for product builders | Hamel Husain & Shreya Shankar (creators of the #1 eval course)",
+      "operator": "Hamel Husain, Shreya Shankar",
+      "date": "2025-09-25",
+      "url": "https://www.youtube.com/watch?v=BsWxPI9UM4c",
+      "eval_relevance": 3
+    },
+    {
+      "file": "lenny/podcasts/howie-liu.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "How we restructured Airtable’s entire org for AI | Howie Liu (co-founder and CEO)",
+      "operator": "Howie Liu",
+      "date": "2025-08-31",
+      "url": "https://www.youtube.com/watch?v=GT0jtVjRy2E",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/inbal-s.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The future of AI in software development | Inbal Shani (CPO of GitHub)",
+      "operator": "Inbal Shani",
+      "date": "2023-12-01",
+      "url": "https://www.youtube.com/watch?v=f10s3rxKaJw",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/itamar-gilad.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Becoming evidence-guided | Itamar Gilad (Gmail, YouTube, Microsoft)",
+      "operator": "Itamar Gilad",
+      "date": "2023-09-21",
+      "url": "https://www.youtube.com/watch?v=aJWSn-tz3jQ",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/jackson-shuttleworth.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Behind the product: Duolingo streaks | Jackson Shuttleworth (Group PM, Retention Team)",
+      "operator": "Jackson Shuttleworth",
+      "date": "2024-12-15",
+      "url": "https://www.youtube.com/watch?v=_CCwoQZH5hI",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/jag-duggal.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Be fundamentally different, not incrementally better | Jag Duggal (Nubank, Facebook, Google, Quantcast)",
+      "operator": "Jag Duggal",
+      "date": "2024-05-16",
+      "url": "https://www.youtube.com/watch?v=8A7wXK2MncQ",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/jason-droege.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "First interview with Scale AI’s CEO: $14B Meta deal, what’s working in enterprise AI, and what frontier labs are building next | Jason Droege",
+      "operator": "Jason Droege",
+      "date": "2025-10-09",
+      "url": "https://www.youtube.com/watch?v=W99jdYZOlN0",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/judd-antin.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The UX research reckoning is here | Judd Antin (Airbnb, Meta)",
+      "operator": "Judd Antin",
+      "date": "2024-01-04",
+      "url": "https://www.youtube.com/watch?v=L6RKi9ZvkT4",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/karina-nguyen.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "OpenAI researcher on why soft skills are the future of work | Karina Nguyen (Research at OpenAI, ex-Anthropic)",
+      "operator": "Karina Nguyen",
+      "date": "2025-02-09",
+      "url": "https://www.youtube.com/watch?v=DeskgjrLxxs",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/katie-dill.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Building beautiful products with Stripe’s Head of Design | Katie Dill (Stripe, Airbnb, Lyft)",
+      "operator": "Katie Dill",
+      "date": "2023-10-15",
+      "url": "https://www.youtube.com/watch?v=gfEEcssu304",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/keith-coleman--jay-baxter.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "An inside look at X’s Community Notes | Keith Coleman (VP of Product) and Jay Baxter (ML Lead)",
+      "operator": "Jay Baxter",
+      "date": "2025-02-27",
+      "url": "https://www.youtube.com/watch?v=8dgyqYHLcCI",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/kevin-weil.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "OpenAI’s CPO on how AI changes must-have skills, moats, coding, startup playbooks, more | Kevin Weil (CPO at OpenAI, ex-Instagram, Twitter)",
+      "operator": "Kevin Weil",
+      "date": "2025-04-10",
+      "url": "https://www.youtube.com/watch?v=scsW6_2SPC4",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/lazar-jovanovic.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The rise of the professional vibe coder (a new AI-era job) | Lazar Jovanovic (Professional Vibe Coder)",
+      "operator": "Lazar Jovanovic",
+      "date": "2026-02-08",
+      "url": "https://www.youtube.com/watch?v=0XNkUdzxiZI",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/logan-kilpatrick.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Inside OpenAI | Logan Kilpatrick (head of developer relations)",
+      "operator": "Logan Kilpatrick",
+      "date": "2024-02-08",
+      "url": "https://www.youtube.com/watch?v=XkMbkWG2ca4",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/marc-andreessen.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Marc Andreessen: The real AI boom hasn’t even started yet",
+      "operator": "Marc Andreessen",
+      "date": "2026-01-29",
+      "url": "https://www.youtube.com/watch?v=87Pm0SGTtN8",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/marily-nika.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "AI and product management | Marily Nika (Meta, Google)",
+      "operator": "Marily Nika",
+      "date": "2023-02-05",
+      "url": "https://www.youtube.com/watch?v=qNPPoj1qUG0",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/mark-pincus.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The hidden pattern behind successful products | Mark Pincus (Founder of Zynga)",
+      "operator": "Mark Pincus",
+      "date": "2026-06-14",
+      "url": "https://www.lennysnewsletter.com/p/the-common-pattern-behind-successful",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/mayur-kamat.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Unconventional product lessons from Binance, N26, Google, more | Mayur Kamat (CPO at N26, ex-Binance Head of Product)",
+      "operator": "Mayur Kamat",
+      "date": "2025-05-22",
+      "url": "https://www.youtube.com/watch?v=UVyfuSBwbNA",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/mike-krieger.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Anthropic’s CPO on what comes next | Mike Krieger (co-founder of Instagram)",
+      "operator": "Mike Krieger",
+      "date": "2025-06-05",
+      "url": "https://www.youtube.com/watch?v=DKrBGOFs0GY",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/nick-turley.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Inside ChatGPT: The fastest-growing product in history | Nick Turley (Head of ChatGPT at OpenAI)",
+      "operator": "Nick Turley",
+      "date": "2025-08-09",
+      "url": "https://www.youtube.com/watch?v=ixY2PvQJ0To",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/nicole-forsgren.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "How to measure AI developer productivity in 2025 | Nicole Forsgren",
+      "operator": "Nicole Forsgren",
+      "date": "2025-10-19",
+      "url": "https://www.youtube.com/watch?v=SWcDfPVTizQ",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/nikhyl-singhal-2.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Why half of product managers are in trouble | Nikhyl Singhal (Meta, Google)",
+      "operator": "Nikhyl Singhal",
+      "date": "2026-04-19",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/ramesh-johari.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Marketplace lessons from Uber, Airbnb, Bumble, and more | Ramesh Johari (Stanford professor, startup advisor)",
+      "operator": "Ramesh Johari",
+      "date": "2023-11-09",
+      "url": "https://www.youtube.com/watch?v=BVzTfsUMaK8",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/robby-stein.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Inside Google's AI turnaround: The rise of AI Mode, strategy behind AI Overviews, and their vision for AI-powered search | Robby Stein (VP of Product, Google Search)",
+      "operator": "Robby Stein",
+      "date": "2025-10-10",
+      "url": "https://www.youtube.com/watch?v=kOnsqqVbIeY",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/ronny-kohavi.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The ultimate guide to A/B testing | Ronny Kohavi (Airbnb, Microsoft, Amazon)",
+      "operator": "Ronny Kohavi",
+      "date": "2023-07-27",
+      "url": "https://www.youtube.com/watch?v=hEzpiDuYFoE",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/ryan-j-salva.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The role of AI in product development | Ryan J. Salva (VP of Product at GitHub, Copilot)",
+      "operator": "Ryan J. Salva",
+      "date": "2022-09-04",
+      "url": "https://www.youtube.com/watch?v=awcd3P1DnX4",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/sander-schulhoff.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "AI prompt engineering in 2025: What works and what doesn’t | Sander Schulhoff (Learn Prompting, HackAPrompt)",
+      "operator": "Sander Schulhoff",
+      "date": "2025-06-19",
+      "url": "https://www.youtube.com/watch?v=eKuFqQKYRrA",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/scott-wu.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "How Devin replaces your junior engineers with infinite AI interns that never sleep | Scott Wu (Cognition CEO)",
+      "operator": "Scott Wu",
+      "date": "2025-09-08",
+      "url": "https://www.youtube.com/watch?v=7m_xKFqSxTo",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/sherwin-wu-v2.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Sherwin Wu V2",
+      "operator": "Sherwin Wu",
+      "date": "2026-02-12",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/shweta-shriva.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Product lessons from Waymo | Shweta Shrivastava (Waymo, Amazon, Cisco)",
+      "operator": "Shweta Shriva",
+      "date": "2023-04-09",
+      "url": "https://www.youtube.com/watch?v=VtNmAjNF3Tc",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/simon-willison.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "An AI state of the union: We’ve passed the inflection point, dark factories are coming, and automation timelines | Simon Willison",
+      "operator": "Simon Willison",
+      "date": "2026-04-02",
+      "eval_relevance": 2
+    },
+    {
+      "file": "lenny/podcasts/tomer-cohen.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Why LinkedIn is turning PMs into AI-powered \"full stack builders” | Tomer Cohen (LinkedIn CPO)",
+      "operator": "Tomer Cohen",
+      "date": "2025-12-04",
+      "url": "https://www.youtube.com/watch?v=R-zCfLQD_84",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/varun-mohan.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "Building a magical AI code editor used by over 1 million developers in four months: The untold story of Windsurf | Varun Mohan (co-founder and CEO)",
+      "operator": "Varun Mohan",
+      "date": "2025-04-20",
+      "url": "https://www.youtube.com/watch?v=5Z0RCxDZdrE",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/varun-parmar.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "An inside look at how Miro builds product: Lessons on outmaneuvering competitors, team structure, product quality, and moving fast | Varun Parmar (CPO of Miro)",
+      "operator": "Varun Parmar",
+      "date": "2023-04-20",
+      "url": "https://www.youtube.com/watch?v=furNg4njlsg",
+      "eval_relevance": 1
+    },
+    {
+      "file": "lenny/podcasts/zevi-arnovitz.md",
+      "publication": "Lenny's Podcast",
+      "kind": "podcast",
+      "title": "The non-technical PM’s guide to building with Cursor | Zevi Arnovitz (Meta)",
+      "operator": "Zevi Arnovitz",
+      "date": "2026-01-18",
+      "url": "https://www.youtube.com/watch?v=1em64iUFt3U",
+      "eval_relevance": 1
     }
   ]
 }

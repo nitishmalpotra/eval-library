@@ -38,6 +38,7 @@ yarn-error.log*
 
 # extraction output
 data/extracted/
+data/evals.pre-*.json
 
 # vercel
 .vercel

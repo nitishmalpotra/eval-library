@@ -1,7 +1,8 @@
 import { copyFile, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
+import { models } from "../src/lib/openrouter";
+import { chatJson } from "./lib/llm";
 
 type RefinementStats = {
   inputTokens: number;
@@ -9,8 +10,7 @@ type RefinementStats = {
   costUsd: number;
 };
 
-const concurrency = 5;
-const retryDelayMs = 5_000;
+const concurrency = 2;
 
 const featureTypeSchema = z.enum([
   "chatbot",
@@ -45,6 +45,7 @@ const refinementSchema = z.object({
   one_liner: z.string().max(119),
   codex_prompt_template: z.string(),
   feature_types: z.array(featureTypeSchema).min(1).max(3),
+  category: z.enum(["methodology", "metric", "process", "framework"]),
 });
 
 type EvalPattern = z.infer<typeof evalPatternSchema>;
@@ -62,12 +63,12 @@ function buildPrompt(pattern: EvalPattern): string {
     source_excerpt: pattern.source_excerpt,
   };
 
-  return `You are refining one eval pattern from a curated AI PM eval library. The current entry has three weak fields. Refine ONLY these three fields. Do not change any other field. Return JSON.
+  return `You are refining one eval pattern from a curated AI PM eval library. Refine ONLY these four fields. Do not change any other field. Return JSON.
 
 CURRENT PATTERN:
 ${JSON.stringify(currentPattern, null, 2)}
 
-REFINE THESE THREE FIELDS:
+REFINE THESE FOUR FIELDS:
 
 1. one_liner — Punchy hook for a card. MUST be under 120 chars. Should hint at the technique, not just describe it abstractly. Active voice. Use the existing definition + explanation as input.
 
@@ -75,8 +76,10 @@ REFINE THESE THREE FIELDS:
 
 3. feature_types — Pick 1-3 SPECIFIC types from this list: chatbot, agent, rag, classification, summarization, code_generation, search_ranking, multimodal. Only include 'general' if the pattern truly applies to every AI feature type AND you didn't find a more specific fit. Most patterns should NOT have 'general' in the list.
 
+4. category — Re-assess the category using these definitions. metric = a number you measure. methodology = a named technique. process = a workflow. framework = a way to think about the whole problem.
+
 OUTPUT JSON:
-{ "one_liner": "...", "codex_prompt_template": "...", "feature_types": ["..."] }`;
+{ "one_liner": "...", "codex_prompt_template": "...", "feature_types": ["..."], "category": "methodology" }`;
 }
 
 // The model is asked for a one_liner under 120 chars but occasionally
@@ -96,57 +99,34 @@ function clampOneLiner(value: string): string {
   return `${base.trimEnd()}…`;
 }
 
-function parseResponse(content: string | null): Refinement {
-  if (!content) {
-    throw new Error("The model returned an empty response.");
-  }
-
-  const raw = JSON.parse(content) as Record<string, unknown>;
-
-  if (typeof raw.one_liner === "string") {
-    raw.one_liner = clampOneLiner(raw.one_liner);
-  }
-
-  return refinementSchema.parse(raw);
-}
-
-async function delay(ms: number): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
-  try {
-    return await fn();
-  } catch {
-    await delay(retryDelayMs);
-    return fn();
-  }
-}
+const looseRefinementSchema = z.object({
+  one_liner: z.string(),
+  codex_prompt_template: z.string(),
+  feature_types: z.array(featureTypeSchema).min(1).max(3),
+  category: z.enum(["methodology", "metric", "process", "framework"]),
+});
 
 async function refinePattern(
   pattern: EvalPattern,
 ): Promise<{ refinement: Refinement; stats: RefinementStats }> {
-  return withRetry(async () => {
-    const response = await getOpenRouter().chat.completions.create(
-      {
-        model: models.pipeline,
-        messages: [{ role: "user", content: buildPrompt(pattern) }],
-        response_format: { type: "json_object" },
-        // Reasoning can consume a small cap and leave empty content.
-        max_tokens: 32_000,
-      },
-      { timeout: pipelineTimeoutMs },
-    );
-
-    return {
-      refinement: parseResponse(response.choices[0]?.message.content ?? null),
-      stats: {
-        inputTokens: response.usage?.prompt_tokens ?? 0,
-        outputTokens: response.usage?.completion_tokens ?? 0,
-        costUsd: usageCostUsd(response.usage),
-      },
-    };
+  const result = await chatJson(looseRefinementSchema, {
+    model: models.pipeline,
+    name: "refinement",
+    max_tokens: 32_000,
+    messages: [{ role: "user", content: buildPrompt(pattern) }],
   });
+
+  return {
+    refinement: refinementSchema.parse({
+      ...result.data,
+      one_liner: clampOneLiner(result.data.one_liner),
+    }),
+    stats: {
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+      costUsd: result.costUsd,
+    },
+  };
 }
 
 async function runBatch<T>(

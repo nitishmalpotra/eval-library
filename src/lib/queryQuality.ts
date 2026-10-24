@@ -5,7 +5,11 @@ const CONSONANT_RUN = /[bcdfghjklmnpqrstvwxz]{5,}/i;
 const REPEATED_CHAR = /(.)\1{5,}/;
 
 export function normalizeQuery(query: string): string {
-  return query.trim().replace(/\s+/g, " ").slice(0, 1000);
+  let text = query.trim().replace(/\s+/g, " ");
+  while (/[.!?,;:]$/.test(text)) {
+    text = text.replace(/[.!?,;:]+$/g, "").trim();
+  }
+  return text.slice(0, 1000);
 }
 
 const KEYBOARD_ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];

@@ -42,7 +42,14 @@ type Metrics = {
 type SweepRow = {
   simFloor: number;
   metrics: Metrics;
+  robustnessOk: boolean;
   current: boolean;
+};
+
+type Robustness = {
+  total: number;
+  passed: number;
+  failures: string[];
 };
 
 const libraryIds = new Set(getAllEvals().map((pattern) => pattern.id));
@@ -146,22 +153,73 @@ function replay(graded: Graded[], simFloor: number): Metrics {
   };
 }
 
-function meetsHard(metrics: Metrics): boolean {
+function meetsHard(metrics: Metrics, robustnessOk: boolean): boolean {
   return (
     metrics.junkRejection >= HARD_GATES.junkRejection &&
     metrics.notARequestMisses === 0 &&
     metrics.falseRejection <= HARD_GATES.falseRejection &&
-    metrics.primaryRecallAt5 >= HARD_GATES.primaryRecallAt5
+    metrics.primaryRecallAt5 >= HARD_GATES.primaryRecallAt5 &&
+    robustnessOk
   );
 }
 
-function penalty(metrics: Metrics): number {
+function penalty(metrics: Metrics, robustnessOk: boolean): number {
   return (
     Math.max(0, HARD_GATES.junkRejection - metrics.junkRejection) +
     Math.max(0, metrics.falseRejection - HARD_GATES.falseRejection) +
     Math.max(0, HARD_GATES.primaryRecallAt5 - metrics.primaryRecallAt5) +
-    metrics.notARequestMisses
+    metrics.notARequestMisses +
+    (robustnessOk ? 0 : 1)
   );
+}
+
+function labeledCases(graded: Graded[]): Graded[] {
+  return graded.filter((row) => !row.item.base_query);
+}
+
+function robustnessOf(graded: Graded[], simFloor: number): Robustness {
+  const byQuery = new Map(graded.map((row) => [row.item.query, row]));
+  const failures: string[] = [];
+  let total = 0;
+  let passed = 0;
+
+  for (const row of graded) {
+    if (!row.item.base_query) continue;
+    total += 1;
+    const base = byQuery.get(row.item.base_query);
+    const problems: string[] = [];
+
+    if (!base) {
+      problems.push("missing base query");
+    } else {
+      const baseDecision = decideFind(base.trace, simFloor);
+      const variantDecision = decideFind(row.trace, simFloor);
+      const baseOutcome = baseDecision.status === "ok" ? "accept" : "reject";
+      const variantOutcome = variantDecision.status === "ok" ? "accept" : "reject";
+      if (baseOutcome !== variantOutcome) problems.push(`outcome ${variantOutcome}, base ${baseOutcome}`);
+
+      const returned = variantDecision.status === "ok" ? variantDecision.matches.map((match) => match.id) : [];
+      const missing = (row.item.primary_ids ?? []).filter((id) => !returned.includes(id));
+      if (missing.length > 0) problems.push(`primary not in top 5: ${missing.join(", ")}`);
+    }
+
+    if (problems.length === 0) passed += 1;
+    else failures.push(`- ${row.item.query}: ${problems.join("; ")}`);
+  }
+
+  return { total, passed, failures };
+}
+
+function acceptMinTop1(graded: Graded[]): number | null {
+  const scores = graded.flatMap((row) =>
+    row.item.expect === "accept" && typeof row.trace.top1 === "number" ? [row.trace.top1] : [],
+  );
+  if (scores.length === 0) return null;
+  return Math.min(...scores);
+}
+
+function roundDown2(value: number): number {
+  return Math.floor(value * 100 + 1e-8) / 100;
 }
 
 function caseProblems(row: Graded, simFloor: number): string[] {
@@ -204,6 +262,7 @@ function caseProblems(row: Graded, simFloor: number): string[] {
 }
 
 function sweepGrid(graded: Graded[]): SweepRow[] {
+  const labeled = labeledCases(graded);
   const observed = graded.flatMap((row) => (row.trace.top1 === null ? [] : [row.trace.top1]));
   const observedMax = observed.length > 0 ? Math.max(...observed) : 0.8;
   const simEnd = Math.min(0.98, Math.max(0.8, Math.ceil(observedMax * 50) / 50));
@@ -211,9 +270,11 @@ function sweepGrid(graded: Graded[]): SweepRow[] {
 
   for (let sim = 0.1; sim <= simEnd + 1e-9; sim += 0.02) {
     const simFloor = Number(sim.toFixed(2));
+    const robustness = robustnessOf(graded, simFloor);
     grid.push({
       simFloor,
-      metrics: replay(graded, simFloor),
+      metrics: replay(labeled, simFloor),
+      robustnessOk: robustness.total > 0 && robustness.failures.length === 0,
       current: simFloor === Number(SIM_FLOOR.toFixed(2)),
     });
   }
@@ -223,32 +284,42 @@ function sweepGrid(graded: Graded[]): SweepRow[] {
 
 function renderReport(input: {
   generatedAt: string;
-  caseCount: number;
+  labeledCount: number;
+  robustness: Robustness;
+  acceptMinTop1: number | null;
+  recommendedFloor: number | null;
+  rejectRows: Array<{ top1: number | null; reason: string; query: string }>;
   metrics: Metrics;
   p50: number;
   p95: number;
   costUsd: number;
   qualityOk: boolean;
   latencyOk: boolean;
+  robustnessOk: boolean;
   reasonMismatches: Array<{ query: string; expected: string; actual: string }>;
   failures: Array<{ query: string; problems: string[] }>;
   sweepNote: string;
   sweepRows: SweepRow[];
 }): string {
-  const hardMet = input.qualityOk && input.latencyOk;
+  const hardMet = input.qualityOk && input.latencyOk && input.robustnessOk;
+  const robustnessRate = input.robustness.total === 0 ? 0 : input.robustness.passed / input.robustness.total;
   const hardRows: Array<[string, string, string, boolean]> = [
     ["Junk rejection", input.metrics.junkRejection.toFixed(3), `≥ ${HARD_GATES.junkRejection}`, input.metrics.junkRejection >= HARD_GATES.junkRejection],
     ["Prompt-injection cases rejected", String(input.metrics.notARequestMisses), "0 missed", input.metrics.notARequestMisses === 0],
     ["False rejection", input.metrics.falseRejection.toFixed(3), `≤ ${HARD_GATES.falseRejection}`, input.metrics.falseRejection <= HARD_GATES.falseRejection],
     ["Primary recall@5", input.metrics.primaryRecallAt5.toFixed(3), `≥ ${HARD_GATES.primaryRecallAt5}`, input.metrics.primaryRecallAt5 >= HARD_GATES.primaryRecallAt5],
     ["Latency p95", `${Math.round(input.p95)} ms`, `≤ ${HARD_GATES.p95Ms} ms`, input.latencyOk],
+    ["Robustness", robustnessRate.toFixed(3), "100%", input.robustnessOk],
   ];
 
   const lines = [
     "# Search eval",
     "",
-    `SIM_FLOOR=${SIM_FLOOR}  cases=${input.caseCount}`,
+    `SIM_FLOOR=${SIM_FLOOR.toFixed(2)}  labeled=${input.labeledCount}  robustness=${input.robustness.total}`,
     `Hard gates met: ${hardMet ? "yes" : "no"}`,
+    "",
+    `Accept-case min top1: ${input.acceptMinTop1 === null ? "none" : input.acceptMinTop1.toFixed(3)}`,
+    `Recommended SIM_FLOOR (accept min − 0.10, round down): ${input.recommendedFloor === null ? "none" : input.recommendedFloor.toFixed(2)}`,
     "",
     `- Generated: ${input.generatedAt}`,
     `- Embedding model: ${models.embed}`,
@@ -296,6 +367,31 @@ function renderReport(input: {
     lines.push("");
   }
 
+  if (input.robustness.failures.length > 0) {
+    lines.push("## Robustness failures", "");
+    lines.push(...input.robustness.failures);
+    lines.push("");
+  }
+
+  const scoredRejects = input.rejectRows.flatMap((row) => (row.top1 === null ? [] : [row.top1]));
+  const sortedRejects = [...scoredRejects].sort((left, right) => left - right);
+  const rejectMedian = sortedRejects.length === 0 ? null : sortedRejects[Math.floor(sortedRejects.length / 2)];
+  const prefilterRejects = input.rejectRows.filter((row) => row.top1 === null).length;
+
+  lines.push("## Reject-case top1 distribution", "");
+  lines.push(
+    scoredRejects.length === 0
+      ? "No scored reject cases."
+      : `n=${sortedRejects.length}  min=${sortedRejects[0].toFixed(3)}  median=${rejectMedian?.toFixed(3)}  max=${sortedRejects[sortedRejects.length - 1].toFixed(3)}  prefilter=${prefilterRejects}`,
+  );
+  lines.push("");
+  lines.push("| top1 | reason | query |");
+  lines.push("| --- | --- | --- |");
+  for (const row of input.rejectRows) {
+    lines.push(`| ${row.top1 === null ? "—" : row.top1.toFixed(3)} | ${row.reason} | ${row.query} |`);
+  }
+  lines.push("");
+
   lines.push("## Threshold sweep", "");
   lines.push("Cached embeddings and judgments only. No extra model calls.");
   lines.push("");
@@ -305,7 +401,7 @@ function renderReport(input: {
   lines.push("| --- | --- | --- | --- | --- | --- |");
   for (const row of input.sweepRows) {
     const mark = row.current ? " current" : "";
-    const pass = meetsHard(row.metrics) ? "yes" : "no";
+    const pass = meetsHard(row.metrics, row.robustnessOk) ? "yes" : "no";
     lines.push(
       `| ${row.simFloor.toFixed(2)} | ${row.metrics.junkRejection.toFixed(3)} | ${row.metrics.notARequestMisses} | ${row.metrics.falseRejection.toFixed(3)} | ${row.metrics.primaryRecallAt5.toFixed(3)} | ${pass}${mark} |`,
     );
@@ -365,43 +461,58 @@ async function main() {
   process.stderr.write("\n");
 
   const generatedAt = new Date().toISOString();
-  const metrics = replay(graded, SIM_FLOOR);
+  const labeled = labeledCases(graded);
+  const metrics = replay(labeled, SIM_FLOOR);
   const latencies = graded.map((row) => row.latencyMs);
   const p50 = percentile(latencies, 50);
   const p95 = percentile(latencies, 95);
   const costUsd = graded.reduce((sum, row) => sum + row.costUsd, 0);
-  const reasonMismatches = graded.flatMap((row) => {
+  const robustness = robustnessOf(graded, SIM_FLOOR);
+  const robustnessOk = robustness.total > 0 && robustness.failures.length === 0;
+  const minTop1 = acceptMinTop1(graded);
+  const recommendedFloor = minTop1 === null ? null : roundDown2(minTop1 - 0.1);
+  const reasonMismatches = labeled.flatMap((row) => {
     if (!row.item.reason || row.result.status !== "rejected" || row.result.reason === row.item.reason) return [];
     return [{ query: row.item.query, expected: row.item.reason, actual: row.result.reason }];
   });
-  const failures = graded.flatMap((row) => {
+  const failures = labeled.flatMap((row) => {
     const problems = caseProblems(row, SIM_FLOOR);
     return problems.length > 0 ? [{ query: row.item.query, problems }] : [];
   });
+  const rejectRows = labeled
+    .filter((row) => row.item.expect === "reject")
+    .map((row) => ({ top1: row.trace.top1, reason: row.item.reason ?? "", query: row.item.query }))
+    .sort((left, right) => (left.top1 ?? -1) - (right.top1 ?? -1));
 
   const grid = sweepGrid(graded);
-  const meeting = grid.filter((row) => meetsHard(row.metrics));
+  const meeting = grid.filter((row) => meetsHard(row.metrics, row.robustnessOk));
   const shown =
     meeting.length > 0
       ? meeting
-      : [...grid].sort((left, right) => penalty(left.metrics) - penalty(right.metrics)).slice(0, 8);
+      : [...grid].sort((left, right) => penalty(left.metrics, left.robustnessOk) - penalty(right.metrics, right.robustnessOk)).slice(0, 8);
   if (!shown.some((row) => row.current)) {
     const current = grid.find((row) => row.current);
     if (current) shown.push(current);
   }
   shown.sort((left, right) => left.simFloor - right.simFloor);
 
-  const qualityOk = meetsHard(metrics);
+  const qualityOk = meetsHard(metrics, true);
   const latencyOk = p95 <= HARD_GATES.p95Ms;
+  const floorOk = recommendedFloor !== null && Number(SIM_FLOOR.toFixed(2)) === recommendedFloor;
   const report = renderReport({
     generatedAt,
-    caseCount: graded.length,
+    labeledCount: labeled.length,
+    robustness,
+    acceptMinTop1: minTop1,
+    recommendedFloor,
+    rejectRows,
     metrics,
     p50,
     p95,
     costUsd,
     qualityOk,
     latencyOk,
+    robustnessOk,
     reasonMismatches,
     failures,
     sweepNote:
@@ -414,7 +525,13 @@ async function main() {
   await writeFile(path.join(process.cwd(), "data", "search-eval-report.md"), report);
   console.log(report);
 
-  if (!qualityOk || !latencyOk) {
+  if (!floorOk) {
+    console.error(
+      `SIM_FLOOR ${SIM_FLOOR} does not match accept-case min top1 ${minTop1 ?? "none"} minus 0.10, rounded down (${recommendedFloor ?? "none"}).`,
+    );
+  }
+
+  if (!qualityOk || !latencyOk || !robustnessOk || !floorOk) {
     process.exitCode = 1;
   }
 }

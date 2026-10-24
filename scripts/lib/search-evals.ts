@@ -12,6 +12,7 @@ export const searchEvalCaseSchema = z
     primary_ids: z.array(z.string().min(1)).min(1).max(2).optional(),
     related_ids: z.array(z.string().min(1)).min(1).optional(),
     note: z.string().optional(),
+    base_query: z.string().trim().min(1).optional(),
   })
   .superRefine((item, ctx) => {
     const primary = item.primary_ids ?? [];

@@ -27,17 +27,17 @@ The deployed demo uses paid APIs; self-hosting lets you use your own keys.
    - `NEXT_PUBLIC_REPO_URL` — optional; GitHub link shown in the UI
 5. Run: `npm run dev` and open http://localhost:3000
 
-You do NOT need a corpus checkout unless you're regenerating the data — the extracted patterns and embeddings are already committed in `data/`. The current select, extract, and curate scripts still read `LENNY_CORPUS_PATH`.
+You do NOT need a corpus checkout unless you're regenerating the data — the extracted patterns and embeddings are already committed in `data/`. Regeneration reads `CORPUS_DIR` (default `./corpus`).
 
 ## Data pipeline (only needed to regenerate the library)
-- `npm run extract:select` — picks the most eval-focused files from Lenny's corpus (Tier 1 hard-coded + Tier 2 ranked by eval-signal density) → `data/files-to-process.json`
+- `npm run extract:triage` — LLM-scores every file in the corpus → `data/triage.json`, `data/files-to-process.json`, and `data/library-stats.json`
 - `npm run extract:patterns` — extraction using `OPENROUTER_MODEL_PIPELINE` (default `anthropic/claude-sonnet-5.5`)
-- `npm run extract:curate` — dedup + merge + validate → `data/evals.json` using `OPENROUTER_MODEL_CLUSTER` (default `anthropic/claude-opus-5.5`)
+- `npm run extract:curate` — dedup + merge + validate → `data/evals.json` using `OPENROUTER_MODEL_CLUSTER` (default `anthropic/claude-opus-5.5`). Writes `data/id-redirects.json` for old pattern URLs.
 - `npm run refine` — pass that tightens each pattern's `one_liner`, `codex_prompt_template`, and `feature_types` in `data/evals.json` (backs up the prior version to `data/evals.pre-refine.json`), using `OPENROUTER_MODEL_PIPELINE`
 - `npm run backfill` — fills any empty `when_not_to_use` / `common_pitfalls` bullet lists, grounded in each pattern's content (idempotent; backs up to `data/evals.pre-backfill.json`)
 - `npm run deepen` — expands thin (<300 char) `explanation` fields into 2-3 grounded paragraphs (idempotent; backs up to `data/evals.pre-deepen.json`)
-- `npm run extract:embed` — embeddings via `OPENROUTER_MODEL_EMBED` (default `openai/text-embedding-3-small`)
-- `npm run extract:all` — runs select → patterns → curate → embed. The quality passes (`refine`, `backfill`, `deepen`) are optional and run separately; run them **before** `extract:embed`, since `refine` and `deepen` change text that feeds the embeddings.
+- `npm run extract:embed` — embeddings via `OPENROUTER_MODEL_EMBED` (default `openai/text-embedding-3-small`). The vector dimension is read from the response.
+- `npm run library:build` — full rebuild: triage → patterns → curate → refine → backfill → deepen → embed. The quality passes are part of the rebuild because they change text that feeds the embeddings. A run stops if projected or actual spend would pass `PIPELINE_BUDGET_USD` (default $35).
 
 ## Attribution
 All source content belongs to Lenny Rachitsky. This project presents extracted summaries and analysis with attribution and direct links back to the originals.

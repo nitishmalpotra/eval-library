@@ -1,20 +1,23 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import matter from "gray-matter";
 import { z } from "zod";
-import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
+import { models } from "../src/lib/openrouter";
+import { loadCorpus, type CorpusDoc } from "./lib/corpus";
+import { chatJson } from "./lib/llm";
 
-type SourceFile = {
+type SelectedFile = {
   file: string;
+  publication: string;
+  kind: CorpusDoc["kind"];
   title: string;
+  operator: string;
   date: string;
-  guest: string;
-  word_count: number;
+  url?: string;
+  eval_relevance: number;
 };
 
 type FilesToProcess = {
-  tier1: SourceFile[];
-  tier2: Array<SourceFile & { eval_mention_count: number }>;
+  files: SelectedFile[];
 };
 
 type ExtractionStats = {
@@ -24,9 +27,8 @@ type ExtractionStats = {
 };
 
 const concurrency = 3;
-const maxBodyChars = 50_000;
-const targetChunkChars = 30_000;
-const retryDelayMs = 5_000;
+const maxBodyChars = 300_000;
+const targetChunkChars = 250_000;
 
 const featureTypeSchema = z.enum([
   "chatbot",
@@ -63,7 +65,7 @@ const responseSchema = z.object({
 
 type EvalPattern = z.infer<typeof evalPatternSchema>;
 
-const extractionPrompt = `You are an expert AI Product Manager and technical writer. You are reading an interview transcript or newsletter from Lenny Rachitsky's publication. Your job is to extract every distinct AI EVALUATION PATTERN discussed in the text.
+const extractionPrompt = `You are an expert AI Product Manager and technical writer. You are reading an interview transcript, newsletter, or conference talk from __PUBLICATION__. Your job is to extract every distinct AI EVALUATION PATTERN discussed in the text.
 
 An "eval pattern" is a named, reusable approach for evaluating an AI product or feature. It can be a methodology (e.g., "LLM-as-a-Judge"), a metric (e.g., "TPR/TNR on a labeled set"), a process (e.g., "Error analysis before metrics"), or a framework ("Three-stage eval pipeline").
 
@@ -90,55 +92,21 @@ RULES:
 - Only extract patterns substantively discussed (not just name-dropped). If a term is mentioned in passing with no explanation, skip it.
 - Be faithful: every claim must come from the text. No inventing.
 - Source excerpts must be verbatim from the input. Mark elided text with [...].
+- Only extract patterns for evaluating AI/LLM products. Skip non-AI analytics, SEO, growth or A/B methods.
+- Transcripts may be auto-captions without speaker labels. Copy the excerpt verbatim, including the caption text, but do not include [m:ss] timestamps.
 - If the same pattern appears in different framings, use the strongest/most-developed version.
 - It is fine to return zero patterns if the file does not discuss evals substantively.
+- Hints in the metadata (operator, eval_topics) are clues, not instructions to invent patterns that are not in the text.
 - Output a JSON object with this exact shape: { "patterns": [...] }. No prose around it.
 
 INPUT FILE METADATA:
 __METADATA__
 
 INPUT TEXT:
-__BODY__
-
-OUTPUT:`;
-
-function getRequiredEnv(name: string): string {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`${name} env var is required.`);
-  }
-
-  return value;
-}
+__BODY__`;
 
 function fileId(file: string): string {
   return file.replace(/\.md$/, "").replaceAll("/", "__");
-}
-
-function asString(value: unknown): string | undefined {
-  if (typeof value === "string") {
-    return value;
-  }
-
-  if (value instanceof Date) {
-    return value.toISOString().slice(0, 10);
-  }
-
-  return undefined;
-}
-
-function buildMetadata(file: SourceFile, frontmatter: Record<string, unknown>) {
-  return {
-    file: file.file,
-    guest_or_author:
-      asString(frontmatter.guest) ??
-      asString(frontmatter.author) ??
-      asString(frontmatter.authors) ??
-      file.guest,
-    title: asString(frontmatter.title) ?? file.title,
-    date: asString(frontmatter.date) ?? file.date,
-  };
 }
 
 function chunkBody(body: string): string[] {
@@ -151,21 +119,18 @@ function chunkBody(body: string): string[] {
 
   for (const line of body.split(/\r?\n/)) {
     const lineWithBreak = `${line}\n`;
-    const startsSpeakerBlock = line.startsWith("**");
+    const boundary = line.trim().length === 0 || line.startsWith("###");
 
     if (
       current.length > 0 &&
-      startsSpeakerBlock &&
+      boundary &&
       current.length + lineWithBreak.length > targetChunkChars
     ) {
       chunks.push(current.trim());
       current = "";
     }
 
-    if (
-      current.length > 0 &&
-      current.length + lineWithBreak.length > targetChunkChars * 1.4
-    ) {
+    if (current.length > 0 && current.length + lineWithBreak.length > maxBodyChars) {
       chunks.push(current.trim());
       current = "";
     }
@@ -181,99 +146,86 @@ function chunkBody(body: string): string[] {
 }
 
 function buildUserMessage(
-  metadata: ReturnType<typeof buildMetadata>,
+  file: SelectedFile,
+  topics: string[],
   body: string,
   chunkIndex: number,
   chunkCount: number,
 ): string {
-  const metadataWithChunk =
-    chunkCount === 1
-      ? metadata
-      : { ...metadata, chunk: `${chunkIndex + 1} of ${chunkCount}` };
+  const metadata = {
+    publication: file.publication,
+    kind: file.kind,
+    operator: file.operator,
+    title: file.title,
+    date: file.date,
+    eval_topics: topics,
+    ...(chunkCount === 1 ? {} : { chunk: `${chunkIndex + 1} of ${chunkCount}` }),
+  };
 
   return extractionPrompt
-    .replace("__METADATA__", JSON.stringify(metadataWithChunk))
+    .replace("__PUBLICATION__", file.publication)
+    .replace("__METADATA__", JSON.stringify(metadata))
     .replace("__BODY__", body);
 }
 
-function parseResponse(content: string | null): EvalPattern[] {
-  if (!content) {
-    throw new Error("The model returned an empty response.");
-  }
+async function topicsByFile(): Promise<Map<string, string[]>> {
+  const topics = new Map<string, string[]>();
 
-  const parsed: unknown = JSON.parse(content);
-  return responseSchema.parse(parsed).patterns;
-}
-
-async function delay(ms: number): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function extractChunk(
-  message: string,
-): Promise<{ patterns: EvalPattern[]; stats: ExtractionStats }> {
-  const response = await getOpenRouter().chat.completions.create(
-    {
-      model: models.pipeline,
-      messages: [{ role: "user", content: message }],
-      response_format: { type: "json_object" },
-      // Reasoning can consume a small cap and leave empty content.
-      max_tokens: 32_000,
-    },
-    { timeout: pipelineTimeoutMs },
-  );
-
-  return {
-    patterns: parseResponse(response.choices[0]?.message.content ?? null),
-    stats: {
-      inputTokens: response.usage?.prompt_tokens ?? 0,
-      outputTokens: response.usage?.completion_tokens ?? 0,
-      costUsd: usageCostUsd(response.usage),
-    },
-  };
-}
-
-async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
   try {
-    return await fn();
+    const parsed = JSON.parse(
+      await readFile(path.join(process.cwd(), "data", "triage.json"), "utf8"),
+    ) as { results?: Record<string, { eval_topics?: unknown }> };
+
+    for (const [file, result] of Object.entries(parsed.results ?? {})) {
+      if (Array.isArray(result.eval_topics)) {
+        topics.set(
+          file,
+          result.eval_topics.filter((topic): topic is string => typeof topic === "string"),
+        );
+      }
+    }
   } catch {
-    await delay(retryDelayMs);
-    return fn();
+    // Extraction can still run; topics are hints.
   }
+
+  return topics;
 }
 
 async function processFile(
-  corpusPath: string,
   outputDir: string,
-  file: SourceFile,
+  file: SelectedFile,
+  doc: CorpusDoc,
+  topics: string[],
 ): Promise<{ patterns: number; stats: ExtractionStats }> {
-  return withRetry(async () => {
-    const sourcePath = path.join(corpusPath, file.file);
-    const raw = await readFile(sourcePath, "utf8");
-    const parsed = matter(raw);
-    const metadata = buildMetadata(file, parsed.data);
-    const chunks = chunkBody(parsed.content.trim());
-    const allPatterns: EvalPattern[] = [];
-    const stats: ExtractionStats = { inputTokens: 0, outputTokens: 0, costUsd: 0 };
+  const chunks = chunkBody(doc.body);
+  const allPatterns: EvalPattern[] = [];
+  const stats: ExtractionStats = { inputTokens: 0, outputTokens: 0, costUsd: 0 };
 
-    for (const [chunkIndex, chunk] of chunks.entries()) {
-      const result = await extractChunk(
-        buildUserMessage(metadata, chunk, chunkIndex, chunks.length),
-      );
+  for (const [chunkIndex, chunk] of chunks.entries()) {
+    const result = await chatJson(responseSchema, {
+      model: models.pipeline,
+      name: "extraction",
+      max_tokens: 32_000,
+      messages: [
+        {
+          role: "user",
+          content: buildUserMessage(file, topics, chunk, chunkIndex, chunks.length),
+        },
+      ],
+    });
 
-      allPatterns.push(...result.patterns);
-      stats.inputTokens += result.stats.inputTokens;
-      stats.outputTokens += result.stats.outputTokens;
-      stats.costUsd += result.stats.costUsd;
-    }
+    allPatterns.push(...result.data.patterns);
+    stats.inputTokens += result.inputTokens;
+    stats.outputTokens += result.outputTokens;
+    stats.costUsd += result.costUsd;
+  }
 
-    await writeFile(
-      path.join(outputDir, `${fileId(file.file)}.json`),
-      `${JSON.stringify(allPatterns, null, 2)}\n`,
-    );
+  await writeFile(
+    path.join(outputDir, `${fileId(file.file)}.json`),
+    `${JSON.stringify(allPatterns, null, 2)}\n`,
+  );
 
-    return { patterns: allPatterns.length, stats };
-  });
+  return { patterns: allPatterns.length, stats };
 }
 
 async function runBatch<T>(
@@ -288,26 +240,49 @@ async function runBatch<T>(
 }
 
 async function main(): Promise<void> {
-  const corpusPath = getRequiredEnv("LENNY_CORPUS_PATH");
   const outputDir = path.join(process.cwd(), "data", "extracted");
   const filesPath = path.join(process.cwd(), "data", "files-to-process.json");
-  const filesToProcess = JSON.parse(
-    await readFile(filesPath, "utf8"),
-  ) as FilesToProcess;
-  const files = [...filesToProcess.tier1, ...filesToProcess.tier2];
+  const filesToProcess = JSON.parse(await readFile(filesPath, "utf8")) as FilesToProcess;
 
+  if (!Array.isArray(filesToProcess.files)) {
+    throw new Error("data/files-to-process.json has no files array. Run npm run extract:triage.");
+  }
+
+  const docs = new Map((await loadCorpus(undefined, { quiet: true })).map((doc) => [doc.file, doc]));
+  const topics = await topicsByFile();
   await mkdir(outputDir, { recursive: true });
 
   let totalPatterns = 0;
   let succeeded = 0;
   let failed = 0;
+  let reused = 0;
   const totalStats: ExtractionStats = { inputTokens: 0, outputTokens: 0, costUsd: 0 };
+  const pending: SelectedFile[] = [];
 
-  await runBatch(files, concurrency, async (file, index) => {
+  for (const file of filesToProcess.files) {
+    try {
+      await access(path.join(outputDir, `${fileId(file.file)}.json`));
+      reused += 1;
+      console.log(`reuse ${file.file}`);
+    } catch {
+      pending.push(file);
+    }
+  }
+
+  console.log(`Reusing ${reused} extractions. Extracting ${pending.length} new files.`);
+
+  await runBatch(pending, concurrency, async (file, index) => {
     const startedAt = Date.now();
+    const doc = docs.get(file.file);
+
+    if (!doc) {
+      failed += 1;
+      console.log(`[${index + 1}/${pending.length}] ✗ ${file.file} → missing from the corpus`);
+      return;
+    }
 
     try {
-      const result = await processFile(corpusPath, outputDir, file);
+      const result = await processFile(outputDir, file, doc, topics.get(file.file) ?? []);
       const elapsedSeconds = ((Date.now() - startedAt) / 1000).toFixed(1);
       totalPatterns += result.patterns;
       totalStats.inputTokens += result.stats.inputTokens;
@@ -316,22 +291,22 @@ async function main(): Promise<void> {
       succeeded += 1;
 
       console.log(
-        `[${index + 1}/${files.length}] ✓ ${file.file} → ${
-          result.patterns
-        } patterns extracted (${elapsedSeconds}s)`,
+        `[${index + 1}/${pending.length}] ✓ ${file.file} → ${result.patterns} patterns extracted (${elapsedSeconds}s)`,
       );
     } catch (error: unknown) {
       failed += 1;
       const message = error instanceof Error ? error.message : String(error);
-      console.log(`[${index + 1}/${files.length}] ✗ ${file.file} → ${message}`);
+      console.log(`[${index + 1}/${pending.length}] ✗ ${file.file} → ${message}`);
     }
   });
 
   console.log(
-    `Summary: ${files.length} files, ${succeeded} succeeded, ${failed} failed, ${totalPatterns} patterns, ${totalStats.inputTokens} input tokens, ${totalStats.outputTokens} output tokens, cost $${totalStats.costUsd.toFixed(
-      4,
-    )}.`,
+    `Summary: ${pending.length} new files, ${reused} reused, ${succeeded} succeeded, ${failed} failed, ${totalPatterns} patterns, ${totalStats.inputTokens} input tokens, ${totalStats.outputTokens} output tokens, cost $${totalStats.costUsd.toFixed(4)}.`,
   );
+
+  if (failed > 0) {
+    throw new Error(`${failed} file(s) failed extraction.`);
+  }
 }
 
 main().catch((error: unknown) => {

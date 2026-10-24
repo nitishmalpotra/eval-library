@@ -1,7 +1,8 @@
 import { copyFile, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import { getOpenRouter, models, pipelineTimeoutMs, usageCostUsd } from "../src/lib/openrouter";
+import { models } from "../src/lib/openrouter";
+import { chatJson } from "./lib/llm";
 
 type BackfillStats = {
   inputTokens: number;
@@ -9,8 +10,7 @@ type BackfillStats = {
   costUsd: number;
 };
 
-const concurrency = 5;
-const retryDelayMs = 5_000;
+const concurrency = 2;
 
 // Bullet-list fields the extraction step (02) occasionally leaves empty. This
 // script regenerates ONLY those, grounded in the pattern's already-curated
@@ -75,62 +75,34 @@ OUTPUT JSON (only the requested key(s)):
 { ${outputShape} }`;
 }
 
-function parseResponse(
-  content: string | null,
-  fields: BackfillField[],
-): Record<BackfillField, string[]> {
-  if (!content) {
-    throw new Error("The model returned an empty response.");
-  }
-
-  const raw = JSON.parse(content) as Record<string, unknown>;
-  const result = {} as Record<BackfillField, string[]>;
-
-  for (const field of fields) {
-    result[field] = bulletListSchema.parse(raw[field]);
-  }
-
-  return result;
-}
-
-async function delay(ms: number): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
-  try {
-    return await fn();
-  } catch {
-    await delay(retryDelayMs);
-    return fn();
-  }
+function responseSchema(fields: BackfillField[]) {
+  return z.object(
+    Object.fromEntries(fields.map((field) => [field, bulletListSchema])) as Record<
+      BackfillField,
+      typeof bulletListSchema
+    >,
+  );
 }
 
 async function backfillPattern(
   pattern: EvalPattern,
   fields: BackfillField[],
 ): Promise<{ filled: Record<BackfillField, string[]>; stats: BackfillStats }> {
-  return withRetry(async () => {
-    const response = await getOpenRouter().chat.completions.create(
-      {
-        model: models.pipeline,
-        messages: [{ role: "user", content: buildPrompt(pattern, fields) }],
-        response_format: { type: "json_object" },
-        // Reasoning can consume a small cap and leave empty content.
-        max_tokens: 32_000,
-      },
-      { timeout: pipelineTimeoutMs },
-    );
-
-    return {
-      filled: parseResponse(response.choices[0]?.message.content ?? null, fields),
-      stats: {
-        inputTokens: response.usage?.prompt_tokens ?? 0,
-        outputTokens: response.usage?.completion_tokens ?? 0,
-        costUsd: usageCostUsd(response.usage),
-      },
-    };
+  const result = await chatJson(responseSchema(fields), {
+    model: models.pipeline,
+    name: "backfill",
+    max_tokens: 32_000,
+    messages: [{ role: "user", content: buildPrompt(pattern, fields) }],
   });
+
+  return {
+    filled: result.data,
+    stats: {
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+      costUsd: result.costUsd,
+    },
+  };
 }
 
 async function runBatch<T>(

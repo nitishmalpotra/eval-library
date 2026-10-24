@@ -14,7 +14,8 @@
     "library:build": "npm run extract:triage && npm run extract:patterns && npm run extract:curate && npm run refine && npm run backfill && npm run deepen && npm run extract:embed",
     "refine": "tsx --env-file-if-exists=.env.local scripts/05-refine.ts",
     "backfill": "tsx --env-file-if-exists=.env.local scripts/06-backfill.ts",
-    "deepen": "tsx --env-file-if-exists=.env.local scripts/07-deepen-explanations.ts"
+    "deepen": "tsx --env-file-if-exists=.env.local scripts/07-deepen-explanations.ts",
+    "eval:search": "tsx --env-file-if-exists=.env.local scripts/08-eval-search.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

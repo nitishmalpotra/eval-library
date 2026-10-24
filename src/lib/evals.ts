@@ -56,12 +56,18 @@ const evalPatternsSchema = z.array(evalPatternSchema);
 const evals = evalPatternsSchema.parse(evalsJson);
 
 export type EvalPattern = z.infer<typeof evalPatternSchema>;
-export type FindMatch = {
-  id: string;
-  rationale: string;
-  score: number;
-  pattern: EvalPattern;
-};
+export type CardFields = Pick<
+  EvalPattern,
+  | "id"
+  | "name"
+  | "one_liner"
+  | "category"
+  | "difficulty"
+  | "feature_types"
+  | "source_operator"
+  | "source_publication"
+  | "source_date"
+>;
 export type FeatureType = (typeof featureTypes)[number];
 export type Category = (typeof categories)[number];
 export type Difficulty = (typeof difficulties)[number];

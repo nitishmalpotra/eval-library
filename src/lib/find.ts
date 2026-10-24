@@ -9,10 +9,11 @@ import { getOpenRouter, models, runtimeReasoning } from "@/lib/openrouter";
 import { isObviousGibberish, normalizeQuery } from "@/lib/queryQuality";
 
 /**
- * No-match floor for google/gemini-embedding-2, set from `npm run eval:search`.
- * Good-query top scores start at 0.61. Junk the judge still accepts sits at or below 0.56.
+ * Junk-only floor for google/gemini-embedding-2.
+ * Lowest accept-case top1 on `npm run eval:search` was 0.609; this is that value minus 0.10, rounded down.
+ * Queries at or above the floor reach the judge. Off-topic and not_a_request come from that verdict.
  */
-export const SIM_FLOOR = 0.58;
+export const SIM_FLOOR = 0.5;
 
 const CACHE_LIMIT = 500;
 const CANDIDATE_LIMIT = 12;
@@ -87,9 +88,13 @@ export function drainFindTraces(): FindTrace[] {
   return traces.splice(0, traces.length);
 }
 
+function findCacheKey(query: string): string {
+  return normalizeQuery(query).toLowerCase();
+}
+
 export function hasCachedFind(query: string): boolean {
   if (tracesEnabled) return false;
-  return cache.has(normalizeQuery(query));
+  return cache.has(findCacheKey(query));
 }
 
 export class FindCreditsError extends Error {
@@ -210,7 +215,8 @@ function toCard(pattern: EvalPattern): CardFields {
 export async function findEvals(query: string): Promise<FindResult> {
   const started = performance.now();
   const normalized = normalizeQuery(query);
-  const cached = tracesEnabled ? undefined : cache.get(normalized);
+  const cacheKey = findCacheKey(query);
+  const cached = tracesEnabled ? undefined : cache.get(cacheKey);
 
   if (cached) {
     logFind({
@@ -248,7 +254,7 @@ export async function findEvals(query: string): Promise<FindResult> {
 
     if (tracesEnabled) traces.push(trace);
 
-    cache.set(normalized, { result, top1: analysis.top1, nStrong: counts.nStrong, nWeak: counts.nWeak });
+    cache.set(cacheKey, { result, top1: analysis.top1, nStrong: counts.nStrong, nWeak: counts.nWeak });
     logFind({
       decision: result.status === "ok" ? "ok" : "rejected",
       reason: result.status === "rejected" ? result.reason : null,

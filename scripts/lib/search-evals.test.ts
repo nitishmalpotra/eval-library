@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { getAllEvals } from "../../src/lib/evals";
+import { normalizeQuery } from "../../src/lib/queryQuality";
 import { loadSearchEvals } from "./search-evals";
 
 const removedRelated: Array<[query: string, id: string]> = [
@@ -37,6 +38,8 @@ const removedRelated: Array<[query: string, id: string]> = [
 describe("search eval set", () => {
   it("has the planned mix and only cites pattern ids that exist", async () => {
     const cases = await loadSearchEvals();
+    const labeled = cases.filter((item) => !item.base_query);
+    const variants = cases.filter((item) => item.base_query);
     const ids = new Set(getAllEvals().map((pattern) => pattern.id));
     const queries = new Set<string>();
     const counts = {
@@ -51,7 +54,9 @@ describe("search eval set", () => {
     for (const item of cases) {
       assert.equal(queries.has(item.query), false, item.query);
       queries.add(item.query);
+    }
 
+    for (const item of labeled) {
       const primary = item.primary_ids ?? [];
       const related = item.related_ids ?? [];
 
@@ -70,13 +75,49 @@ describe("search eval set", () => {
       }
     }
 
-    assert.equal(cases.length, 60);
+    assert.equal(labeled.length, 60);
+    assert.equal(variants.length, 40);
     assert.equal(counts.specific, 25);
     assert.equal(counts.short, 10);
     assert.equal(counts.gibberish, 8);
     assert.equal(counts.off_topic, 8);
     assert.equal(counts.not_a_request, 5);
     assert.equal(counts.too_vague, 4);
+
+    const byBase = new Map<string, typeof variants>();
+    for (const variant of variants) {
+      const base = labeled.find((item) => item.query === variant.base_query);
+      assert.ok(base, variant.base_query);
+      assert.equal(variant.expect, "accept");
+      assert.equal(base.expect, "accept");
+      assert.deepEqual(variant.primary_ids, base.primary_ids);
+      assert.ok((variant.primary_ids?.length ?? 0) > 0, variant.query);
+      const group = byBase.get(base.query) ?? [];
+      group.push(variant);
+      byBase.set(base.query, group);
+    }
+
+    assert.equal(byBase.size, 10);
+    for (const [baseQuery, group] of byBase) {
+      assert.equal(group.length, 4, baseQuery);
+      const period = group.find((item) => item.note === "Robustness: trailing period.");
+      const question = group.find((item) => item.note === "Robustness: trailing question mark.");
+      const spaced = group.find((item) => item.note === "Robustness: doubled spaces.");
+      const cased = group.find((item) => item.note === "Robustness: capitalized first letter.");
+      assert.ok(period && question && spaced && cased, baseQuery);
+      const caseVariant =
+        baseQuery[0] === baseQuery[0].toLowerCase()
+          ? `${baseQuery[0].toUpperCase()}${baseQuery.slice(1)}`
+          : `${baseQuery[0].toLowerCase()}${baseQuery.slice(1)}`;
+      assert.equal(period.query, `${baseQuery}.`);
+      assert.equal(question.query, `${baseQuery}?`);
+      assert.equal(spaced.query, baseQuery.replaceAll(" ", "  "));
+      assert.equal(cased.query, caseVariant);
+      assert.equal(normalizeQuery(period.query), normalizeQuery(baseQuery));
+      assert.equal(normalizeQuery(question.query), normalizeQuery(baseQuery));
+      assert.equal(normalizeQuery(spaced.query), normalizeQuery(baseQuery));
+      assert.equal(normalizeQuery(cased.query).toLowerCase(), normalizeQuery(baseQuery).toLowerCase());
+    }
 
     for (const [query, id] of removedRelated) {
       const item = cases.find((candidate) => candidate.query === query);

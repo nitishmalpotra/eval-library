@@ -88,7 +88,7 @@ async function main(): Promise<void> {
 
       vectors.push({
         id: batch[index].id,
-        vector: embedding.embedding,
+        vector: embedding.embedding.map((value) => Number(value.toFixed(6))),
       });
     }
   }

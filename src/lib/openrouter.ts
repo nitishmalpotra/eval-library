@@ -36,7 +36,7 @@ export const models = {
   pipeline: process.env.OPENROUTER_MODEL_PIPELINE ?? "anthropic/claude-sonnet-5.5",
   cluster: process.env.OPENROUTER_MODEL_CLUSTER ?? "anthropic/claude-opus-5.5",
   runtime: process.env.OPENROUTER_MODEL_RUNTIME ?? "anthropic/claude-haiku-5.5",
-  embed: process.env.OPENROUTER_MODEL_EMBED ?? "openai/text-embedding-3-small",
+  embed: process.env.OPENROUTER_MODEL_EMBED ?? "google/gemini-embedding-2",
 };
 
 /** Pipeline scripts override the 20s client timeout. Extraction can take minutes. */

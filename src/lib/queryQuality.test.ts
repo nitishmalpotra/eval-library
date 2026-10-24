@@ -7,6 +7,13 @@ describe("normalizeQuery", () => {
     assert.equal(normalizeQuery("  a   support   bot  "), "a support bot");
     assert.equal(normalizeQuery(`x${"y".repeat(2000)}`).length, 1000);
   });
+
+  it("treats a trailing period as the same CRM query and keeps casing", () => {
+    const crm = "a summarizer that turns call transcripts into CRM notes";
+    assert.equal(normalizeQuery(`${crm}.`), normalizeQuery(crm));
+    assert.equal(normalizeQuery(crm), crm);
+    assert.equal(normalizeQuery(`A${crm.slice(1)}`), `A${crm.slice(1)}`);
+  });
 });
 
 describe("isObviousGibberish", () => {

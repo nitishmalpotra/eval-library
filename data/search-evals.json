@@ -492,5 +492,521 @@
     "expect": "reject",
     "reason": "too_vague",
     "note": "Names AI and nothing the product does."
+  },
+  {
+    "query": "A public chatbot needs a filter for toxic and off-tone replies before users see them..",
+    "expect": "accept",
+    "primary_ids": [
+      "toxicity-and-offensive-content-detection",
+      "guardrail-evals-runtime-blocking"
+    ],
+    "related_ids": [
+      "adversarial-red-team-datasets-and-defense-testing"
+    ],
+    "note": "Robustness: trailing period.",
+    "base_query": "A public chatbot needs a filter for toxic and off-tone replies before users see them."
+  },
+  {
+    "query": "A public chatbot needs a filter for toxic and off-tone replies before users see them.?",
+    "expect": "accept",
+    "primary_ids": [
+      "toxicity-and-offensive-content-detection",
+      "guardrail-evals-runtime-blocking"
+    ],
+    "related_ids": [
+      "adversarial-red-team-datasets-and-defense-testing"
+    ],
+    "note": "Robustness: trailing question mark.",
+    "base_query": "A public chatbot needs a filter for toxic and off-tone replies before users see them."
+  },
+  {
+    "query": "a public chatbot needs a filter for toxic and off-tone replies before users see them.",
+    "expect": "accept",
+    "primary_ids": [
+      "toxicity-and-offensive-content-detection",
+      "guardrail-evals-runtime-blocking"
+    ],
+    "related_ids": [
+      "adversarial-red-team-datasets-and-defense-testing"
+    ],
+    "note": "Robustness: capitalized first letter.",
+    "base_query": "A public chatbot needs a filter for toxic and off-tone replies before users see them."
+  },
+  {
+    "query": "A  public  chatbot  needs  a  filter  for  toxic  and  off-tone  replies  before  users  see  them.",
+    "expect": "accept",
+    "primary_ids": [
+      "toxicity-and-offensive-content-detection",
+      "guardrail-evals-runtime-blocking"
+    ],
+    "related_ids": [
+      "adversarial-red-team-datasets-and-defense-testing"
+    ],
+    "note": "Robustness: doubled spaces.",
+    "base_query": "A public chatbot needs a filter for toxic and off-tone replies before users see them."
+  },
+  {
+    "query": "I'm building a support chatbot that answers from our help center docs. What should I eval?.",
+    "expect": "accept",
+    "primary_ids": [
+      "rag-retrieval-evaluation-recall-k",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "related_ids": [
+      "known-answer-probing-against-the-source-corpus",
+      "llm-as-a-judge"
+    ],
+    "note": "Robustness: trailing period.",
+    "base_query": "I'm building a support chatbot that answers from our help center docs. What should I eval?"
+  },
+  {
+    "query": "I'm building a support chatbot that answers from our help center docs. What should I eval??",
+    "expect": "accept",
+    "primary_ids": [
+      "rag-retrieval-evaluation-recall-k",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "related_ids": [
+      "known-answer-probing-against-the-source-corpus",
+      "llm-as-a-judge"
+    ],
+    "note": "Robustness: trailing question mark.",
+    "base_query": "I'm building a support chatbot that answers from our help center docs. What should I eval?"
+  },
+  {
+    "query": "i'm building a support chatbot that answers from our help center docs. What should I eval?",
+    "expect": "accept",
+    "primary_ids": [
+      "rag-retrieval-evaluation-recall-k",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "related_ids": [
+      "known-answer-probing-against-the-source-corpus",
+      "llm-as-a-judge"
+    ],
+    "note": "Robustness: capitalized first letter.",
+    "base_query": "I'm building a support chatbot that answers from our help center docs. What should I eval?"
+  },
+  {
+    "query": "I'm  building  a  support  chatbot  that  answers  from  our  help  center  docs.  What  should  I  eval?",
+    "expect": "accept",
+    "primary_ids": [
+      "rag-retrieval-evaluation-recall-k",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "related_ids": [
+      "known-answer-probing-against-the-source-corpus",
+      "llm-as-a-judge"
+    ],
+    "note": "Robustness: doubled spaces.",
+    "base_query": "I'm building a support chatbot that answers from our help center docs. What should I eval?"
+  },
+  {
+    "query": "An assistant that books meetings on my calendar by emailing the other person and writing the invite..",
+    "expect": "accept",
+    "primary_ids": [
+      "progressive-autonomy-ladder-with-human-review-logging"
+    ],
+    "related_ids": [
+      "trajectory-level-agent-evaluation",
+      "autonomous-resolution-rate-as-agent-outcome-metric"
+    ],
+    "note": "Robustness: trailing period.",
+    "base_query": "An assistant that books meetings on my calendar by emailing the other person and writing the invite."
+  },
+  {
+    "query": "An assistant that books meetings on my calendar by emailing the other person and writing the invite.?",
+    "expect": "accept",
+    "primary_ids": [
+      "progressive-autonomy-ladder-with-human-review-logging"
+    ],
+    "related_ids": [
+      "trajectory-level-agent-evaluation",
+      "autonomous-resolution-rate-as-agent-outcome-metric"
+    ],
+    "note": "Robustness: trailing question mark.",
+    "base_query": "An assistant that books meetings on my calendar by emailing the other person and writing the invite."
+  },
+  {
+    "query": "an assistant that books meetings on my calendar by emailing the other person and writing the invite.",
+    "expect": "accept",
+    "primary_ids": [
+      "progressive-autonomy-ladder-with-human-review-logging"
+    ],
+    "related_ids": [
+      "trajectory-level-agent-evaluation",
+      "autonomous-resolution-rate-as-agent-outcome-metric"
+    ],
+    "note": "Robustness: capitalized first letter.",
+    "base_query": "An assistant that books meetings on my calendar by emailing the other person and writing the invite."
+  },
+  {
+    "query": "An  assistant  that  books  meetings  on  my  calendar  by  emailing  the  other  person  and  writing  the  invite.",
+    "expect": "accept",
+    "primary_ids": [
+      "progressive-autonomy-ladder-with-human-review-logging"
+    ],
+    "related_ids": [
+      "trajectory-level-agent-evaluation",
+      "autonomous-resolution-rate-as-agent-outcome-metric"
+    ],
+    "note": "Robustness: doubled spaces.",
+    "base_query": "An assistant that books meetings on my calendar by emailing the other person and writing the invite."
+  },
+  {
+    "query": "We summarize sales calls into CRM notes and need to know when the notes invent quotes..",
+    "expect": "accept",
+    "primary_ids": [
+      "source-grounded-verification-pass-quotes-and-citations",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "related_ids": [
+      "simulated-jury-evaluation-of-llm-generated-notes"
+    ],
+    "note": "Robustness: trailing period.",
+    "base_query": "We summarize sales calls into CRM notes and need to know when the notes invent quotes."
+  },
+  {
+    "query": "We summarize sales calls into CRM notes and need to know when the notes invent quotes.?",
+    "expect": "accept",
+    "primary_ids": [
+      "source-grounded-verification-pass-quotes-and-citations",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "related_ids": [
+      "simulated-jury-evaluation-of-llm-generated-notes"
+    ],
+    "note": "Robustness: trailing question mark.",
+    "base_query": "We summarize sales calls into CRM notes and need to know when the notes invent quotes."
+  },
+  {
+    "query": "we summarize sales calls into CRM notes and need to know when the notes invent quotes.",
+    "expect": "accept",
+    "primary_ids": [
+      "source-grounded-verification-pass-quotes-and-citations",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "related_ids": [
+      "simulated-jury-evaluation-of-llm-generated-notes"
+    ],
+    "note": "Robustness: capitalized first letter.",
+    "base_query": "We summarize sales calls into CRM notes and need to know when the notes invent quotes."
+  },
+  {
+    "query": "We  summarize  sales  calls  into  CRM  notes  and  need  to  know  when  the  notes  invent  quotes.",
+    "expect": "accept",
+    "primary_ids": [
+      "source-grounded-verification-pass-quotes-and-citations",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "related_ids": [
+      "simulated-jury-evaluation-of-llm-generated-notes"
+    ],
+    "note": "Robustness: doubled spaces.",
+    "base_query": "We summarize sales calls into CRM notes and need to know when the notes invent quotes."
+  },
+  {
+    "query": "RAG search over our internal docs. I want to know if the retriever finds the right pages before the model answers..",
+    "expect": "accept",
+    "primary_ids": [
+      "rag-retrieval-evaluation-recall-k",
+      "per-step-pipeline-evaluation"
+    ],
+    "related_ids": [
+      "known-answer-probing-against-the-source-corpus",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "note": "Robustness: trailing period.",
+    "base_query": "RAG search over our internal docs. I want to know if the retriever finds the right pages before the model answers."
+  },
+  {
+    "query": "RAG search over our internal docs. I want to know if the retriever finds the right pages before the model answers.?",
+    "expect": "accept",
+    "primary_ids": [
+      "rag-retrieval-evaluation-recall-k",
+      "per-step-pipeline-evaluation"
+    ],
+    "related_ids": [
+      "known-answer-probing-against-the-source-corpus",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "note": "Robustness: trailing question mark.",
+    "base_query": "RAG search over our internal docs. I want to know if the retriever finds the right pages before the model answers."
+  },
+  {
+    "query": "rAG search over our internal docs. I want to know if the retriever finds the right pages before the model answers.",
+    "expect": "accept",
+    "primary_ids": [
+      "rag-retrieval-evaluation-recall-k",
+      "per-step-pipeline-evaluation"
+    ],
+    "related_ids": [
+      "known-answer-probing-against-the-source-corpus",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "note": "Robustness: capitalized first letter.",
+    "base_query": "RAG search over our internal docs. I want to know if the retriever finds the right pages before the model answers."
+  },
+  {
+    "query": "RAG  search  over  our  internal  docs.  I  want  to  know  if  the  retriever  finds  the  right  pages  before  the  model  answers.",
+    "expect": "accept",
+    "primary_ids": [
+      "rag-retrieval-evaluation-recall-k",
+      "per-step-pipeline-evaluation"
+    ],
+    "related_ids": [
+      "known-answer-probing-against-the-source-corpus",
+      "faithfulness-and-hallucination-evaluation"
+    ],
+    "note": "Robustness: doubled spaces.",
+    "base_query": "RAG search over our internal docs. I want to know if the retriever finds the right pages before the model answers."
+  },
+  {
+    "query": "A bot that reviews pull requests and leaves comments on the diff..",
+    "expect": "accept",
+    "primary_ids": [
+      "ai-reviewer-agents-cross-model-critique"
+    ],
+    "related_ids": [
+      "execution-based-verification-of-ai-generated-code",
+      "suggestion-acceptance-rate"
+    ],
+    "note": "Robustness: trailing period.",
+    "base_query": "A bot that reviews pull requests and leaves comments on the diff."
+  },
+  {
+    "query": "A bot that reviews pull requests and leaves comments on the diff.?",
+    "expect": "accept",
+    "primary_ids": [
+      "ai-reviewer-agents-cross-model-critique"
+    ],
+    "related_ids": [
+      "execution-based-verification-of-ai-generated-code",
+      "suggestion-acceptance-rate"
+    ],
+    "note": "Robustness: trailing question mark.",
+    "base_query": "A bot that reviews pull requests and leaves comments on the diff."
+  },
+  {
+    "query": "a bot that reviews pull requests and leaves comments on the diff.",
+    "expect": "accept",
+    "primary_ids": [
+      "ai-reviewer-agents-cross-model-critique"
+    ],
+    "related_ids": [
+      "execution-based-verification-of-ai-generated-code",
+      "suggestion-acceptance-rate"
+    ],
+    "note": "Robustness: capitalized first letter.",
+    "base_query": "A bot that reviews pull requests and leaves comments on the diff."
+  },
+  {
+    "query": "A  bot  that  reviews  pull  requests  and  leaves  comments  on  the  diff.",
+    "expect": "accept",
+    "primary_ids": [
+      "ai-reviewer-agents-cross-model-critique"
+    ],
+    "related_ids": [
+      "execution-based-verification-of-ai-generated-code",
+      "suggestion-acceptance-rate"
+    ],
+    "note": "Robustness: doubled spaces.",
+    "base_query": "A bot that reviews pull requests and leaves comments on the diff."
+  },
+  {
+    "query": "A proactive assistant that pings me to prep for a meeting. I need the ping rate to be trustworthy..",
+    "expect": "accept",
+    "primary_ids": [
+      "false-positive-false-negative-rate-monitoring-for-proactive-ai-assistants"
+    ],
+    "related_ids": [
+      "outcome-metrics-over-engagement-proxies"
+    ],
+    "note": "Robustness: trailing period.",
+    "base_query": "A proactive assistant that pings me to prep for a meeting. I need the ping rate to be trustworthy."
+  },
+  {
+    "query": "A proactive assistant that pings me to prep for a meeting. I need the ping rate to be trustworthy.?",
+    "expect": "accept",
+    "primary_ids": [
+      "false-positive-false-negative-rate-monitoring-for-proactive-ai-assistants"
+    ],
+    "related_ids": [
+      "outcome-metrics-over-engagement-proxies"
+    ],
+    "note": "Robustness: trailing question mark.",
+    "base_query": "A proactive assistant that pings me to prep for a meeting. I need the ping rate to be trustworthy."
+  },
+  {
+    "query": "a proactive assistant that pings me to prep for a meeting. I need the ping rate to be trustworthy.",
+    "expect": "accept",
+    "primary_ids": [
+      "false-positive-false-negative-rate-monitoring-for-proactive-ai-assistants"
+    ],
+    "related_ids": [
+      "outcome-metrics-over-engagement-proxies"
+    ],
+    "note": "Robustness: capitalized first letter.",
+    "base_query": "A proactive assistant that pings me to prep for a meeting. I need the ping rate to be trustworthy."
+  },
+  {
+    "query": "A  proactive  assistant  that  pings  me  to  prep  for  a  meeting.  I  need  the  ping  rate  to  be  trustworthy.",
+    "expect": "accept",
+    "primary_ids": [
+      "false-positive-false-negative-rate-monitoring-for-proactive-ai-assistants"
+    ],
+    "related_ids": [
+      "outcome-metrics-over-engagement-proxies"
+    ],
+    "note": "Robustness: doubled spaces.",
+    "base_query": "A proactive assistant that pings me to prep for a meeting. I need the ping rate to be trustworthy."
+  },
+  {
+    "query": "Our agent can read private customer records and send email. How do I eval the chance it leaks data?.",
+    "expect": "accept",
+    "primary_ids": [
+      "lethal-trifecta-risk-check-for-agents"
+    ],
+    "related_ids": [
+      "guardrail-evals-runtime-blocking"
+    ],
+    "note": "Robustness: trailing period.",
+    "base_query": "Our agent can read private customer records and send email. How do I eval the chance it leaks data?"
+  },
+  {
+    "query": "Our agent can read private customer records and send email. How do I eval the chance it leaks data??",
+    "expect": "accept",
+    "primary_ids": [
+      "lethal-trifecta-risk-check-for-agents"
+    ],
+    "related_ids": [
+      "guardrail-evals-runtime-blocking"
+    ],
+    "note": "Robustness: trailing question mark.",
+    "base_query": "Our agent can read private customer records and send email. How do I eval the chance it leaks data?"
+  },
+  {
+    "query": "our agent can read private customer records and send email. How do I eval the chance it leaks data?",
+    "expect": "accept",
+    "primary_ids": [
+      "lethal-trifecta-risk-check-for-agents"
+    ],
+    "related_ids": [
+      "guardrail-evals-runtime-blocking"
+    ],
+    "note": "Robustness: capitalized first letter.",
+    "base_query": "Our agent can read private customer records and send email. How do I eval the chance it leaks data?"
+  },
+  {
+    "query": "Our  agent  can  read  private  customer  records  and  send  email.  How  do  I  eval  the  chance  it  leaks  data?",
+    "expect": "accept",
+    "primary_ids": [
+      "lethal-trifecta-risk-check-for-agents"
+    ],
+    "related_ids": [
+      "guardrail-evals-runtime-blocking"
+    ],
+    "note": "Robustness: doubled spaces.",
+    "base_query": "Our agent can read private customer records and send email. How do I eval the chance it leaks data?"
+  },
+  {
+    "query": "I wrote an LLM judge for support-answer quality and need to know if it agrees with human raters..",
+    "expect": "accept",
+    "primary_ids": [
+      "validating-an-llm-judge-against-human-labels"
+    ],
+    "related_ids": [
+      "llm-as-a-judge",
+      "judge-bias-audit-position-sycophancy-self-preference-verbosity"
+    ],
+    "note": "Robustness: trailing period.",
+    "base_query": "I wrote an LLM judge for support-answer quality and need to know if it agrees with human raters."
+  },
+  {
+    "query": "I wrote an LLM judge for support-answer quality and need to know if it agrees with human raters.?",
+    "expect": "accept",
+    "primary_ids": [
+      "validating-an-llm-judge-against-human-labels"
+    ],
+    "related_ids": [
+      "llm-as-a-judge",
+      "judge-bias-audit-position-sycophancy-self-preference-verbosity"
+    ],
+    "note": "Robustness: trailing question mark.",
+    "base_query": "I wrote an LLM judge for support-answer quality and need to know if it agrees with human raters."
+  },
+  {
+    "query": "i wrote an LLM judge for support-answer quality and need to know if it agrees with human raters.",
+    "expect": "accept",
+    "primary_ids": [
+      "validating-an-llm-judge-against-human-labels"
+    ],
+    "related_ids": [
+      "llm-as-a-judge",
+      "judge-bias-audit-position-sycophancy-self-preference-verbosity"
+    ],
+    "note": "Robustness: capitalized first letter.",
+    "base_query": "I wrote an LLM judge for support-answer quality and need to know if it agrees with human raters."
+  },
+  {
+    "query": "I  wrote  an  LLM  judge  for  support-answer  quality  and  need  to  know  if  it  agrees  with  human  raters.",
+    "expect": "accept",
+    "primary_ids": [
+      "validating-an-llm-judge-against-human-labels"
+    ],
+    "related_ids": [
+      "llm-as-a-judge",
+      "judge-bias-audit-position-sycophancy-self-preference-verbosity"
+    ],
+    "note": "Robustness: doubled spaces.",
+    "base_query": "I wrote an LLM judge for support-answer quality and need to know if it agrees with human raters."
+  },
+  {
+    "query": "Our chatbot agrees with the user even when the user is wrong. I want that caught before each release..",
+    "expect": "accept",
+    "primary_ids": [
+      "sycophancy-regression-metric-per-release"
+    ],
+    "related_ids": [
+      "judge-bias-audit-position-sycophancy-self-preference-verbosity"
+    ],
+    "note": "Robustness: trailing period.",
+    "base_query": "Our chatbot agrees with the user even when the user is wrong. I want that caught before each release."
+  },
+  {
+    "query": "Our chatbot agrees with the user even when the user is wrong. I want that caught before each release.?",
+    "expect": "accept",
+    "primary_ids": [
+      "sycophancy-regression-metric-per-release"
+    ],
+    "related_ids": [
+      "judge-bias-audit-position-sycophancy-self-preference-verbosity"
+    ],
+    "note": "Robustness: trailing question mark.",
+    "base_query": "Our chatbot agrees with the user even when the user is wrong. I want that caught before each release."
+  },
+  {
+    "query": "our chatbot agrees with the user even when the user is wrong. I want that caught before each release.",
+    "expect": "accept",
+    "primary_ids": [
+      "sycophancy-regression-metric-per-release"
+    ],
+    "related_ids": [
+      "judge-bias-audit-position-sycophancy-self-preference-verbosity"
+    ],
+    "note": "Robustness: capitalized first letter.",
+    "base_query": "Our chatbot agrees with the user even when the user is wrong. I want that caught before each release."
+  },
+  {
+    "query": "Our  chatbot  agrees  with  the  user  even  when  the  user  is  wrong.  I  want  that  caught  before  each  release.",
+    "expect": "accept",
+    "primary_ids": [
+      "sycophancy-regression-metric-per-release"
+    ],
+    "related_ids": [
+      "judge-bias-audit-position-sycophancy-self-preference-verbosity"
+    ],
+    "note": "Robustness: doubled spaces.",
+    "base_query": "Our chatbot agrees with the user even when the user is wrong. I want that caught before each release."
   }
 ]

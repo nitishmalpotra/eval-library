@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { EvalCard } from "@/components/EvalCard";
 import type { FindMatch, RejectionReason } from "@/lib/findTypes";
 
@@ -55,6 +55,12 @@ const rewrites: Record<RejectionReason, string[]> = {
   ],
 };
 
+const starters = [
+  "A support chatbot that answers from our help center",
+  "An agent that books meetings on my calendar",
+  "RAG search over our internal docs",
+];
+
 const repoUrl = process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/nitishmalpotra/eval-library";
 
 function isRejectionReason(reason: unknown): reason is RejectionReason {
@@ -70,6 +76,7 @@ export function FindClient({ dailyLimit, patternCount }: { dailyLimit: number; p
   const [view, setView] = useState<View>({ kind: "idle" });
   const resultsRef = useRef<HTMLDivElement>(null);
   const queryRef = useRef<HTMLTextAreaElement>(null);
+  const atStart = !isLoading && view.kind === "idle";
 
   useEffect(() => {
     setQuery(starterQuery);
@@ -82,6 +89,13 @@ export function FindClient({ dailyLimit, patternCount }: { dailyLimit: number; p
   function applyRewrite(example: string) {
     setQuery(example);
     queryRef.current?.focus();
+  }
+
+  function onComposerKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      event.currentTarget.form?.requestSubmit();
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -127,7 +141,8 @@ export function FindClient({ dailyLimit, patternCount }: { dailyLimit: number; p
 
       setView({ kind: "ok", matches: data.matches ?? [] });
       requestAnimationFrame(() => {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        resultsRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
       });
     } catch {
       setView({ kind: "error", message: "Unable to find evals right now" });
@@ -140,81 +155,103 @@ export function FindClient({ dailyLimit, patternCount }: { dailyLimit: number; p
   const weak = view.kind === "ok" ? view.matches.filter((match) => match.fit === "weak") : [];
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-12 text-slate-950 dark:text-slate-100">
-      <header>
-        <Link href="/learn" className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
-          First time here? See how it works →
-        </Link>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-          Find an eval for your feature
-        </h1>
-        <p className="mt-3 text-slate-600 dark:text-slate-400">
-          Describe what you are building. We will surface the closest patterns from the library.
-        </p>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          {dailyLimit} searches a day on the live demo · the full library is always open.
-        </p>
-      </header>
-
-      <form id="find-form" className="mt-8" onSubmit={handleSubmit}>
-        <label htmlFor="query" className="sr-only">
-          Describe your AI feature
-        </label>
-        <textarea
-          ref={queryRef}
-          id="query"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          rows={5}
-          maxLength={1000}
-          required
-          className="w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-          placeholder="I'm building a customer support chatbot that pulls answers from a help center. What evals should I have?"
-        />
-        <div className="mt-4 flex items-center justify-between gap-4">
-          <p aria-live="polite" className="font-mono text-xs text-slate-500 dark:text-slate-400">
-            {remaining} of {dailyLimit} left today
+    <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
+      <div className={atStart ? "find-start" : ""}>
+        <header className={atStart ? "text-center" : ""}>
+          <Link href="/learn" className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted underline decoration-accent underline-offset-4">
+            New here? Read the five chapters
+          </Link>
+          <h1 className={`mt-4 tracking-tight text-ink ${atStart ? "mx-auto max-w-[12ch] text-4xl sm:text-5xl" : "text-3xl"}`}>
+            What are you building?
+          </h1>
+          <p className={`mt-3 text-muted ${atStart ? "mx-auto max-w-[36ch]" : "max-w-[48ch]"}`}>
+            Describe the feature. The field guide will pull the closest patterns.
           </p>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="rounded-md bg-blue-600 px-5 py-2.5 text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400 dark:bg-blue-500"
-          >
-            {isLoading ? "Finding..." : "Find evals"}
-          </button>
-        </div>
-      </form>
+        </header>
 
-      <div ref={resultsRef} className="mt-10 space-y-6">
-        {isLoading &&
-          Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="h-40 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-900" />
-          ))}
+        <form id="find-form" className={atStart ? "mx-auto mt-8 w-full max-w-2xl" : "mt-8"} onSubmit={handleSubmit}>
+          <div className="find-composer">
+            <label htmlFor="query" className="sr-only">
+              Describe your AI feature
+            </label>
+            <textarea
+              ref={queryRef}
+              id="query"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={onComposerKeyDown}
+              rows={3}
+              maxLength={1000}
+              required
+              className="find-ruled"
+              placeholder="A support chatbot that answers from our help center…"
+            />
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <p className="allowance-chip" aria-live="polite">
+                {remaining} of {dailyLimit} left today
+              </p>
+              <button type="submit" disabled={isLoading} className="find-send">
+                {isLoading ? "Finding…" : "Find evals"}
+              </button>
+            </div>
+          </div>
+        </form>
+
+        {atStart ? (
+          <div className="mx-auto mt-4 flex max-w-2xl flex-wrap justify-center gap-2">
+            {starters.map((example) => (
+              <button key={example} type="button" onClick={() => applyRewrite(example)} className="filter-chip">
+                {example}
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+
+      <div ref={resultsRef} className="mt-8 scroll-mt-24 space-y-6">
+        {isLoading ? (
+          <div>
+            <p className="find-status" aria-hidden="true">
+              <span>Reading {patternCount} patterns…</span>
+              <span>Checking fit…</span>
+              <span>Writing margin notes…</span>
+            </p>
+            <p className="sr-only" aria-live="polite">
+              Reading {patternCount} patterns
+            </p>
+            <div className="mt-4 space-y-4">
+              {Array.from({ length: 3 }, (_, index) => (
+                <div key={index} className="find-ghost" aria-hidden="true">
+                  <span className="find-ghost-line find-ghost-line-lg" />
+                  <span className="find-ghost-line" />
+                  <span className="find-ghost-line" style={{ width: "48%" }} />
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {!isLoading && view.kind === "credits" && (
-          <section className="my-6 rounded-lg border border-amber-200 bg-amber-50 p-6 dark:border-amber-800 dark:bg-amber-950/30">
-            <p className="text-sm text-amber-700 dark:text-amber-300">DEMO LIMIT REACHED</p>
-            <h2 className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
-              The live demo&apos;s API credits are exhausted for now.
-            </h2>
-            <p className="mt-3 text-slate-700 dark:text-slate-300">
-              The semantic search relies on a paid API and the budget on this hosted demo has run out. The full library
-              is still browseable, and you can keep using the search by self-hosting with your own API keys —
-              instructions in the README take about 5 minutes.
+          <section className="border border-line bg-card p-6">
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">Demo limit reached</p>
+            <h2 className="mt-2 text-2xl tracking-tight text-ink">The live demo&apos;s API credits are exhausted for now.</h2>
+            <p className="mt-3 leading-7 text-ink">
+              The semantic search relies on a paid API and the budget on this hosted demo has run out. The full library is
+              still browseable, and you can keep using the search by self-hosting with your own API keys — instructions in
+              the README take about 5 minutes.
             </p>
-            <LibraryLinks patternCount={patternCount} />
+            <div className="mt-5">
+              <LibraryLinks patternCount={patternCount} />
+            </div>
           </section>
         )}
 
         {!isLoading && view.kind === "limited" && (
-          <section className="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900/60">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-              You&apos;ve used today&apos;s {dailyLimit} searches. Thanks for exploring!
-            </h2>
+          <section className="border border-line bg-card p-6">
+            <h2 className="text-2xl tracking-tight text-ink">The notebook is full for today.</h2>
+            <p className="mt-3 leading-7 text-ink">You&apos;ve used today&apos;s {dailyLimit} searches. The library stays open.</p>
             {view.resetAt ? (
-              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                Searches reset {new Date(view.resetAt).toLocaleString()}.
-              </p>
+              <p className="mt-2 text-sm text-muted">Searches reset {new Date(view.resetAt).toLocaleString()}.</p>
             ) : null}
             <div className="mt-5">
               <LibraryLinks patternCount={patternCount} />
@@ -223,25 +260,20 @@ export function FindClient({ dailyLimit, patternCount }: { dailyLimit: number; p
         )}
 
         {!isLoading && view.kind === "error" && (
-          <div className="flex items-center justify-between gap-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-300">
+          <div className="flex items-center justify-between gap-4 border border-line border-l-accent bg-card px-4 py-3 text-sm text-ink">
             <span>{view.message}</span>
-            <button type="submit" form="find-form" className="font-medium underline underline-offset-2">
+            <button type="submit" form="find-form" className="underline decoration-accent underline-offset-2">
               Try again
             </button>
           </div>
         )}
 
         {!isLoading && view.kind === "rejected" && (
-          <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-200">
-            <p>{rejectionMessages[view.reason]}</p>
-            <div className="mt-3 flex flex-col items-start gap-2">
+          <div className="sticky-note">
+            <p className="leading-6">{rejectionMessages[view.reason]}</p>
+            <div className="mt-3">
               {rewrites[view.reason].map((example) => (
-                <button
-                  key={example}
-                  type="button"
-                  onClick={() => applyRewrite(example)}
-                  className="text-left font-medium text-blue-700 underline underline-offset-2 hover:text-blue-800 dark:text-blue-300"
-                >
+                <button key={example} type="button" onClick={() => applyRewrite(example)} className="sticky-note-rewrite">
                   {example}
                 </button>
               ))}
@@ -249,43 +281,35 @@ export function FindClient({ dailyLimit, patternCount }: { dailyLimit: number; p
           </div>
         )}
 
-        {!isLoading && view.kind === "idle" && (
-          <p className="text-sm leading-6 text-slate-500 dark:text-slate-400">
-            Try: &apos;I&apos;m building an agent that books meetings on my calendar&apos; or &apos;I need evals for a
-            RAG-based search over our docs.&apos;
-          </p>
-        )}
-
         {!isLoading && view.kind === "ok" && view.matches.length === 0 && (
-          <div className="rounded-md border border-gray-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
+          <div className="border border-dashed border-line px-4 py-4 text-sm leading-6 text-muted">
             We understood your feature, but nothing in the library is a strong match yet.{" "}
-            <Link href="/browse" className="font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
-              Browse all {patternCount} patterns →
+            <Link href="/browse" className="text-ink underline decoration-accent underline-offset-4">
+              Browse all {patternCount} patterns
             </Link>
           </div>
         )}
 
-        {!isLoading &&
-          strong.map((match) => (
-            <section key={match.id}>
-              <p className="mb-3 italic text-slate-600 dark:text-slate-400">Why this fits: {match.rationale}</p>
-              <EvalCard pattern={match.pattern} />
-            </section>
-          ))}
+        {!isLoading && strong.length > 0 ? (
+          <div className="stagger space-y-6">
+            {strong.map((match, index) => (
+              <section key={match.id} className="reveal" style={{ ["--i" as string]: index }}>
+                <p className="mb-3 text-sm italic text-muted">Why this fits: {match.rationale}</p>
+                <EvalCard pattern={match.pattern} specimen={match.specimen} />
+              </section>
+            ))}
+          </div>
+        ) : null}
 
         {!isLoading && weak.length > 0 && (
-          <section className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-4 text-slate-500 opacity-80 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-400">
-            <h2 className="text-sm font-semibold tracking-tight text-slate-600 dark:text-slate-300">
-              Margin notes: weaker matches
-            </h2>
-            <p className="mt-1 text-sm leading-6">
-              Related, but not a direct fit. Try adding what the feature does and who uses it.
-            </p>
+          <section className="find-weak">
+            <h2 className="text-sm tracking-tight text-ink">Margin notes: weaker matches</h2>
+            <p className="mt-1 text-sm leading-6">Related, but not a direct fit. Try adding what the feature does and who uses it.</p>
             <div className="mt-4 space-y-6">
               {weak.map((match) => (
                 <div key={match.id}>
-                  <p className="mb-3 italic">Why this fits: {match.rationale}</p>
-                  <EvalCard pattern={match.pattern} />
+                  <p className="mb-3 text-sm italic">Why this fits: {match.rationale}</p>
+                  <EvalCard pattern={match.pattern} specimen={match.specimen} />
                 </div>
               ))}
             </div>
@@ -295,8 +319,8 @@ export function FindClient({ dailyLimit, patternCount }: { dailyLimit: number; p
 
       {!isLoading && view.kind === "ok" && view.matches.length > 0 && (
         <footer className="mt-10">
-          <Link href="/browse" className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
-            Not seeing the right pattern? Browse all {patternCount} →
+          <Link href="/browse" className="text-sm text-ink underline decoration-accent underline-offset-4">
+            Not seeing the right pattern? Browse all {patternCount}
           </Link>
         </footer>
       )}
@@ -307,19 +331,16 @@ export function FindClient({ dailyLimit, patternCount }: { dailyLimit: number; p
 function LibraryLinks({ patternCount }: { patternCount: number }) {
   return (
     <div className="flex flex-wrap gap-3">
-      <Link
-        href="/browse"
-        className="rounded-md bg-blue-600 px-4 py-2.5 text-white transition hover:bg-blue-700 dark:bg-blue-500"
-      >
-        Browse all {patternCount} patterns →
+      <Link href="/browse" className="find-send inline-flex items-center">
+        Browse all {patternCount} patterns
       </Link>
       <a
         href={`${repoUrl}#quickstart`}
         target="_blank"
         rel="noopener noreferrer"
-        className="rounded-md border border-slate-300 bg-white px-4 py-2.5 text-slate-900 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+        className="inline-flex items-center border border-line bg-card px-4 py-2 text-sm text-ink"
       >
-        Self-host with your own keys →
+        Self-host with your own keys
       </a>
     </div>
   );

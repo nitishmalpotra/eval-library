@@ -1,20 +1,9 @@
 import { z } from "zod";
 import evalsJson from "../../data/evals.json";
+import { categories, difficulties, featureTypes } from "./taxonomy";
 
-export const featureTypes = [
-  "chatbot",
-  "agent",
-  "rag",
-  "classification",
-  "summarization",
-  "code_generation",
-  "search_ranking",
-  "multimodal",
-  "general",
-] as const;
-
-export const categories = ["methodology", "metric", "process", "framework"] as const;
-export const difficulties = ["beginner", "intermediate", "advanced"] as const;
+export { categories, difficulties, featureTypes };
+export type { Category, Difficulty, FeatureType } from "./taxonomy";
 
 const sourceSchema = z.object({
   file: z.string(),
@@ -54,6 +43,9 @@ const evalPatternSchema = z.object({
 
 const evalPatternsSchema = z.array(evalPatternSchema);
 const evals = evalPatternsSchema.parse(evalsJson);
+const specimenById = new Map(
+  evals.map((pattern) => pattern.id).sort((left, right) => left.localeCompare(right)).map((id, index) => [id, index + 1]),
+);
 
 export type EvalPattern = z.infer<typeof evalPatternSchema>;
 export type CardFields = Pick<
@@ -68,12 +60,13 @@ export type CardFields = Pick<
   | "source_publication"
   | "source_date"
 >;
-export type FeatureType = (typeof featureTypes)[number];
-export type Category = (typeof categories)[number];
-export type Difficulty = (typeof difficulties)[number];
 
 export function getAllEvals() {
   return evals;
+}
+
+export function getSpecimenNumber(id: string) {
+  return specimenById.get(id) ?? 0;
 }
 
 export function getEvalById(id: string) {

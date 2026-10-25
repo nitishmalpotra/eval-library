@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { featureTypes } from "@/lib/evals";
+import { featureTypes } from "@/lib/taxonomy";
 
 export function FeatureTypeFilter() {
   const router = useRouter();
@@ -36,14 +36,11 @@ export function FeatureTypeFilter() {
           <button
             key={featureType}
             type="button"
+            aria-pressed={active}
             onClick={() => toggleFeatureType(featureType)}
-            className={`rounded-full border px-3 py-1.5 font-mono text-xs uppercase tracking-[0.14em] transition ${
-              active
-                ? "border-blue-600 bg-blue-600 text-white dark:border-blue-500 dark:bg-blue-500"
-                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:text-slate-100"
-            }`}
+            className="filter-chip"
           >
-            {featureType}
+            {featureType.replaceAll("_", " ")}
           </button>
         );
       })}

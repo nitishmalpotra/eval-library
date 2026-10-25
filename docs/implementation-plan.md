@@ -1,5 +1,17 @@
 # Implementation Plan: OpenRouter, Multi-Source Corpus, Production RAG, Redesign, Docs
 
+**Status: completed 2026-10-25.**
+
+Workstreams 1–4 are on `main`. This branch is workstream 5. The body below is the plan as written on 2026-10-23 and was not revised.
+
+| Workstream | Pull request | When |
+|---|---|---|
+| 1. OpenRouter swap | [#4](https://github.com/nitishmalpotra/eval-library/pull/4) | merged 2026-10-23 |
+| 2. Multi-source corpus and full rebuild | [#5](https://github.com/nitishmalpotra/eval-library/pull/5) | merged 2026-10-24 |
+| 3. Production `/find` | [#6](https://github.com/nitishmalpotra/eval-library/pull/6). Punctuation follow-up [#7](https://github.com/nitishmalpotra/eval-library/pull/7) | merged 2026-10-24 |
+| 4. Field-guide redesign | [#8](https://github.com/nitishmalpotra/eval-library/pull/8) | merged 2026-10-25 |
+| 5. Docs sweep and archive | this branch, `docs/sweep` | written 2026-10-25 |
+
 **Written:** 2026-10-23 · **For:** an AI implementer (Codex / Claude Code / Cursor) · **Owner:** Nitish Malpotra
 
 Read this whole file before starting. It records decisions the owner has **already made**, so don't reopen them. Where this plan says "verify", check the live docs or code before acting. **Per `AGENTS.md`, this Next.js version may differ from your training data, so read the relevant guide in `node_modules/next/dist/docs/` before writing any Next.js code.** The installed version is Next 15.5.18 and that docs folder doesn't exist in it. Use https://nextjs.org/docs (v15) instead, and don't assume Next 16 APIs.

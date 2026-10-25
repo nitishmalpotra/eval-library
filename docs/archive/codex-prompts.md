@@ -1,3 +1,5 @@
+> **Archived 2026-10. Superseded by README.md, docs/eval-library-spec.md and docs/implementation-plan.md. Kept for history.**
+
 # Codex Prompts — The Eval Library Build
 
 A sequenced set of prompts to drive Codex through the build. Each prompt is self-contained but references `eval-library-spec.md` (the master spec) — keep that file open in the Codex session.

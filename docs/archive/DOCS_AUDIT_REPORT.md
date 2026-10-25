@@ -1,3 +1,5 @@
+> **Archived 2026-10. Superseded by README.md, docs/eval-library-spec.md and docs/implementation-plan.md. Kept for history.**
+
 # Documentation Audit Report
 
 **Date:** 2026-05-24

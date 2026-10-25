@@ -1,3 +1,5 @@
+> **Archived 2026-10. Superseded by README.md, docs/eval-library-spec.md and docs/implementation-plan.md. Kept for history.**
+
 # AI PM Field Guide — Product Ideation
 
 A synthesis of corpus analysis + external research into concrete product ideas you could build on top of Lenny's newsletter & podcast corpus, aimed at **working AI PMs + aspiring AI PMs**, shipped as a free, open-source, static-site-plus-RAG-API web product.

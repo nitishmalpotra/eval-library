@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { LearnClient } from "./LearnClient";
-import { getAllEvals, getEvalById } from "@/lib/evals";
+import { getAllEvals, getEvalById, getSpecimenNumber } from "@/lib/evals";
 
 export const metadata: Metadata = {
-  title: "Learn the basics · AI PM Eval Library",
+  title: "Learn",
   openGraph: {
     images: ["/opengraph-image"],
   },
@@ -20,12 +20,15 @@ export default function LearnPage() {
   const workedExample = getEvalById("evals-as-the-new-prd") ?? getEvalById("llm-as-a-judge") ?? patterns[0];
   const tourPattern = getEvalById("eval-lifecycle") ?? patterns.find((pattern) => pattern.feature_types.includes("agent")) ?? patterns[0];
 
+  const specimenById = Object.fromEntries(patterns.map((pattern) => [pattern.id, getSpecimenNumber(pattern.id)]));
+
   return (
     <LearnClient
       beginnerPattern={beginnerPattern}
       categoryExamples={categoryExamples}
       workedExample={workedExample}
       tourPattern={tourPattern}
+      specimenById={specimenById}
     />
   );
 }

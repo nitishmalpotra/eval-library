@@ -122,6 +122,7 @@ async function main(): Promise<void> {
   const filesByPublication = countBy(docs.map((doc) => doc.publication));
   const selectedByPublication = countBy(selected.map((file) => file.publication));
   const stats = {
+    generated_at: new Date().toISOString(),
     files_scanned: docs.length,
     files_by_publication: filesByPublication,
     files_selected: selected.length,

@@ -24,18 +24,16 @@ export function PromptTemplateCopier({ prompt }: { prompt: string }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 text-slate-100">
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-        <span className="font-mono text-xs uppercase tracking-[0.16em] text-slate-400">Prompt template</span>
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="rounded-full border border-white/15 px-3 py-1 text-sm text-slate-200 transition hover:border-white/30 hover:bg-white/10"
-        >
-          {copied ? "Copied" : "Copy"}
+    <div className="recipe">
+      <div className="recipe-bar">
+        <span>Recipe</span>
+        <button type="button" onClick={handleCopy} className="recipe-copy">
+          <span key={copied ? "copied" : "copy"} className="copy-label" aria-live="polite">
+            {copied ? "Copied ✓" : "Copy"}
+          </span>
         </button>
       </div>
-      <pre className="overflow-x-auto whitespace-pre-wrap p-4 text-sm leading-6">
+      <pre>
         <code>{prompt}</code>
       </pre>
     </div>

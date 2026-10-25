@@ -1,42 +1,24 @@
 import Link from "next/link";
 import type { CardFields } from "@/lib/evals";
-import { CategoryBadge } from "./CategoryBadge";
-import { DifficultyBadge } from "./DifficultyBadge";
 
-export function EvalCard({ pattern }: { pattern: CardFields }) {
+export function EvalCard({ pattern, specimen }: { pattern: CardFields; specimen: number }) {
+  const number = String(specimen).padStart(2, "0");
+
   return (
-    <Link
-      href={`/eval/${pattern.id}`}
-      className="group flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-slate-950/40"
-    >
-      <div className="flex flex-wrap gap-2">
-        <CategoryBadge category={pattern.category} />
-        <DifficultyBadge difficulty={pattern.difficulty} />
-        {pattern.feature_types[0] ? (
-          <span className="inline-flex rounded-full bg-blue-50 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.16em] text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">
-            {pattern.feature_types[0]}
+    <Link href={`/eval/${pattern.id}`} data-category={pattern.category} className="specimen group">
+      <span className="specimen-tab">{pattern.category}</span>
+      <p className="font-mono text-[11px] tracking-[0.16em] text-muted">No. {number}</p>
+      <h2 className="highlight mt-3 font-display text-lg font-medium leading-snug tracking-tight text-ink">{pattern.name}</h2>
+      <p className="mt-2 flex-1 text-sm leading-6 text-ink">{pattern.one_liner}</p>
+      <p className="mt-5 flex flex-wrap gap-x-1.5 font-mono text-[11px] leading-5 text-muted">
+        <span className="text-ink">{pattern.source_operator}</span>
+        {pattern.source_publication ? <span>· {pattern.source_publication}</span> : null}
+        {pattern.source_date ? (
+          <span className="whitespace-nowrap">
+            · <time dateTime={pattern.source_date}>{pattern.source_date}</time>
           </span>
         ) : null}
-      </div>
-      <h2 className="mt-4 text-lg font-semibold tracking-tight text-slate-950 group-hover:text-blue-700 dark:text-slate-100 dark:group-hover:text-blue-400">
-        {pattern.name}
-      </h2>
-      <p className="mt-2 flex-1 text-sm leading-6 text-slate-600 dark:text-slate-400">{pattern.one_liner}</p>
-      <div className="mt-5 border-t border-slate-100 pt-4 text-xs text-slate-500 dark:border-slate-800">
-        <span className="font-medium text-slate-700 dark:text-slate-300">{pattern.source_operator}</span>
-        {pattern.source_publication ? (
-          <>
-            <span className="mx-2 text-slate-300">·</span>
-            <span>{pattern.source_publication}</span>
-          </>
-        ) : null}
-        {pattern.source_date ? (
-          <>
-            <span className="mx-2 text-slate-300">·</span>
-            <time dateTime={pattern.source_date}>{pattern.source_date}</time>
-          </>
-        ) : null}
-      </div>
+      </p>
     </Link>
   );
 }

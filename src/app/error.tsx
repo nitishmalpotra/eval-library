@@ -4,13 +4,11 @@ import Link from "next/link";
 
 export default function ErrorPage() {
   return (
-    <main className="mx-auto flex max-w-3xl flex-col items-start px-6 py-20">
-      <p className="font-mono text-xs uppercase tracking-[0.18em] text-slate-500">Error</p>
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-        Something went sideways.
-      </h1>
-      <Link href="/" className="mt-6 text-sm text-blue-600 dark:text-blue-400">
-        Back to home →
+    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-4 py-16 sm:px-6">
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">Error</p>
+      <h1 className="mt-4 max-w-[16ch] text-4xl tracking-tight text-ink">The page tore out of the binding.</h1>
+      <Link href="/" className="mt-6 text-sm text-ink underline decoration-accent underline-offset-4">
+        Back to the front
       </Link>
     </main>
   );

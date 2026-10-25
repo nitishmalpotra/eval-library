@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import Link from "next/link";
 import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "@/components/Providers";
 import { SiteNav } from "@/components/SiteNav";
 import "./globals.css";
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  axes: ["opsz"],
+});
 
 const inter = Inter({
   variable: "--font-inter",
@@ -18,8 +24,11 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),
-  title: "AI PM Eval Library",
-  description: "Every AI eval pattern from Lenny's operators, made buildable.",
+  title: {
+    default: "The AI Eval Field Guide",
+    template: "%s · The AI Eval Field Guide",
+  },
+  description: "Eval patterns from the people who ship AI, sourced, cited, and ready to use.",
   openGraph: {
     images: ["/opengraph-image"],
   },
@@ -42,33 +51,30 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${jetBrainsMono.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${inter.variable} ${jetBrainsMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <body className="flex min-h-full flex-col font-sans text-ink">
         <Providers>
           <SiteNav />
-          <div className="flex-1">{children}</div>
-          <footer className="border-t border-slate-200 dark:border-slate-800">
-            <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-6 text-sm text-slate-500 dark:text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-1 flex-col">{children}</div>
+          <footer className="border-t border-line">
+            <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <p>
-                AI PM Eval Library · Built from Lenny Rachitsky&apos;s corpus · Built by{" "}
+                The AI Eval Field Guide · Built by{" "}
                 <a
                   href="https://www.linkedin.com/in/nitishmalpotra/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-slate-900 hover:underline underline-offset-4 dark:hover:text-slate-100"
+                  className="text-ink underline decoration-rule underline-offset-4 hover:decoration-accent"
                 >
                   Nitish Malpotra
                 </a>
               </p>
               <div className="flex gap-4">
-                <Link href="/about" className="hover:text-slate-900 dark:hover:text-slate-100">
+                <Link href="/about" className="hover:text-ink">
                   About
                 </Link>
-                <a
-                  href={process.env.NEXT_PUBLIC_REPO_URL ?? "#"}
-                  className="hover:text-slate-900 dark:hover:text-slate-100"
-                >
+                <a href={process.env.NEXT_PUBLIC_REPO_URL ?? "#"} className="hover:text-ink">
                   GitHub
                 </a>
               </div>

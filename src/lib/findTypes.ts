@@ -10,6 +10,7 @@ export type FindMatch = {
   score: number;
   fit: "strong" | "weak";
   pattern: CardFields;
+  specimen: number;
 };
 
 export type FindResult =

@@ -5,7 +5,7 @@ import { findDailyLimit } from "@/lib/findQuota";
 import { FindClient } from "./FindClient";
 
 export const metadata: Metadata = {
-  title: "Find an eval for your feature · AI PM Eval Library",
+  title: "Find",
   openGraph: {
     images: ["/opengraph-image"],
   },

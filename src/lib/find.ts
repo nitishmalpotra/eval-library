@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { z } from "zod";
 import type { CardFields, EvalPattern } from "@/lib/evals";
-import { getAllEvals } from "@/lib/evals";
+import { getAllEvals, getSpecimenNumber } from "@/lib/evals";
 import { createFindCache } from "@/lib/findCache";
 import type { FindMatch, FindResult, RejectionReason } from "@/lib/findTypes";
 import { getOpenRouter, models, runtimeReasoning } from "@/lib/openrouter";
@@ -47,7 +47,7 @@ export type FindTrace = FindAnalysis & {
   cached: boolean;
 };
 
-type CoreMatch = Omit<FindMatch, "pattern">;
+type CoreMatch = Omit<FindMatch, "pattern" | "specimen">;
 
 type CoreResult = { status: "ok"; matches: CoreMatch[] } | { status: "rejected"; reason: RejectionReason };
 
@@ -463,7 +463,7 @@ function attachCards(result: CoreResult, cards: Map<string, CardFields>): FindRe
     status: "ok",
     matches: result.matches.flatMap((match) => {
       const pattern = cards.get(match.id);
-      return pattern ? [{ ...match, pattern }] : [];
+      return pattern ? [{ ...match, pattern, specimen: getSpecimenNumber(match.id) }] : [];
     }),
   };
 }
